@@ -1,0 +1,174 @@
+<div class="modal-body">
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+    <!-- Product Name -->
+    <div class="mb-3">
+      <label for="productName" class="form-label">Product Name</label>
+      <input
+        type="text"
+        id="productName"
+        class="form-control"
+        formControlName="productName"
+        placeholder="Enter product name"
+      />
+      <div
+        *ngIf="
+          productForm.get('productName')?.invalid &&
+          productForm.get('productName')?.touched
+        "
+        class="text-danger"
+      >
+        Product name is required.
+      </div>
+    </div>
+
+    <!-- Category -->
+    <div class="mb-3">
+      <label for="category" class="form-label">Category</label>
+      <select id="category" class="form-select" formControlName="category">
+        <option value="" disabled selected>Select category</option>
+        <option
+          *ngFor="let category of categories?.data"
+          [value]="category.category_id"
+        >
+          {{ category.category_name }}
+        </option>
+      </select>
+      <div
+        *ngIf="
+          productForm.get('category')?.invalid &&
+          productForm.get('category')?.touched
+        "
+        class="text-danger"
+      >
+        Category is required.
+      </div>
+    </div>
+
+    <!-- Vendor -->
+
+    <div class="mb-3">
+      <label for="vendor" class="form-label">Vendor</label>
+      <div class="form-check" *ngFor="let vendor of vendors?.data">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          [value]="vendor.vendor_id"
+          (change)="onVendorChange($event)"
+          [checked]="isSelected(vendor.vendor_id)"
+        />
+        <label class="form-check-label">
+          {{ vendor.vendor_name }}
+        </label>
+      </div>
+      <div
+        *ngIf="
+          productForm.get('vendor')?.invalid &&
+          productForm.get('vendor')?.touched
+        "
+        class="text-danger"
+      >
+        Vendor is required.
+      </div>
+    </div>
+
+    <!-- Quantity -->
+    <div class="mb-3">
+      <label for="quantity" class="form-label">Quantity in stock</label>
+      <input
+        type="number"
+        id="quantity"
+        class="form-control"
+        formControlName="quantity"
+        placeholder="Enter quantity"
+      />
+      <div
+        *ngIf="
+          productForm.get('quantity')?.invalid &&
+          productForm.get('quantity')?.touched
+        "
+        class="text-danger"
+      >
+        Quantity must be at least 1.
+      </div>
+    </div>
+
+    <!-- Unit -->
+    <div class="mb-3">
+      <label for="unit" class="form-label">Unit</label>
+      <input
+        type="text"
+        id="unit"
+        class="form-control"
+        formControlName="unit"
+        placeholder="Enter unit (e.g., Maggie)"
+      />
+      <div
+        *ngIf="
+          productForm.get('unit')?.invalid && productForm.get('unit')?.touched
+        "
+        class="text-danger"
+      >
+        Unit is required.
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="mb-3">
+      <label for="status" class="form-label">Status</label>
+      <select id="status" class="form-select" formControlName="status">
+        <option value="" disabled selected>Select status</option>
+        <option value="1">Available</option>
+        <option value="0">Out of Stock</option>
+      </select>
+      <div
+        *ngIf="
+          productForm.get('status')?.invalid &&
+          productForm.get('status')?.touched
+        "
+        class="text-danger"
+      >
+        Status is required.
+      </div>
+    </div>
+
+    <!-- Upload Image -->
+    <div class="mb-3">
+      <label for="productImage" class="form-label">Upload product image</label>
+      <div
+        class="border rounded d-flex justify-content-center align-items-center p-3"
+        style="height: 150px"
+      >
+        <input
+          type="file"
+          id="productImage"
+          class="form-control"
+          formControlName="productImage"
+          (change)="onImageSelected($event)"
+        />
+        <div class="text-center">
+          <p class="text-muted mb-0">Click to upload or drag and drop</p>
+          <p class="text-muted small">SVG, PNG, JPG or GIF (max. 800x400px)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="d-flex justify-content-end">
+      <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">
+        Cancel
+      </button>
+      <button type="button" class="btn btn-primary px-4" (click)="onUpload()">
+        Upload files&nbsp;&nbsp;
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="productForm.invalid"
+        data-bs-dismiss="modal"
+        accept=".svg, .png, .jpg, .jpeg, .webp"
+      >
+        Add
+      </button>
+    </div>
+  </form>
+</div>

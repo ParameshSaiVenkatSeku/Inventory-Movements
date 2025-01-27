@@ -1,0 +1,41 @@
+.violet-button {
+  background-color: rgb(128, 0, 128);
+  color: white;
+  border: none;
+}
+
+.violet-button:hover {
+  background-color: rgb(0, 110, 110);
+}
+.card {
+  margin-top: 80px;
+  border-radius: 20px;
+  padding: 3%;
+}
+.card-header {
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+
+.btn-black {
+  background-color: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+.btn-black:hover {
+  background-color: #333;
+  border-color: #333;
+}
+
+.btn-light-black {
+  background-color: #f8f9fa;
+  color: #000;
+  border-color: #ddd;
+}
+
+.btn-light-black:hover {
+  background-color: #e2e6ea;
+  color: #000;
+  border-color: #ccc;
+}

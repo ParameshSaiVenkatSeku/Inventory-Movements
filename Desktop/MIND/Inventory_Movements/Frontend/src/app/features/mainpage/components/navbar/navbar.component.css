@@ -1,0 +1,27 @@
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+  transform: translateX(5px);
+  transition: all 0.2s ease;
+}
+
+.dropdown-menu {
+  min-width: 200px;
+  padding: 0.5rem;
+}
+
+.dropdown-item {
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030; /* Ensure it stays above other content */
+}

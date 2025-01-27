@@ -1,0 +1,131 @@
+<div class="card border-0 shadow-sm">
+  <div>
+    <div *ngIf="showAlert" class="alert alert-success">
+      {{ alertMessage }}
+    </div>
+
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr class="text-secondary">
+            <th>Product Name</th>
+            <th>Category</th>
+            <th>Vendors</th>
+            <th>Quantity</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of cartData">
+            <td>
+              <div class="d-flex align-items-center">
+                <img
+                  [src]="item.product_image"
+                  class="rounded me-2"
+                  alt="Product"
+                  style="width: 32px; height: 32px; object-fit: cover"
+                />
+                <span>{{ item.product_name }}</span>
+              </div>
+            </td>
+            <td>{{ item.category_name }}</td>
+            <td>
+              <!-- Dropdown for Vendor Names -->
+              <select
+                class="form-select form-select-sm"
+                [(ngModel)]="item.vendorId"
+                style="width: 150px"
+              >
+                <option value="" selected>Select vendor</option>
+                <!-- Populate vendors dynamically -->
+                <option
+                  *ngFor="let vendor of item.vendorNames"
+                  [value]="vendor"
+                >
+                  {{ vendor }}
+                </option>
+              </select>
+            </td>
+            <td>
+              <div class="d-flex align-items-center" style="width: 100px">
+                <button
+                  class="btn btn-outline-secondary btn-sm px-2"
+                  type="button"
+                  (click)="decrementQuantity(item)"
+                >
+                  −
+                </button>
+                <span class="mx-3">{{ item.quantity || 1 }}</span>
+                <button
+                  class="btn btn-outline-secondary btn-sm px-2"
+                  type="button"
+                  (click)="incrementQuantity(item)"
+                >
+                  +
+                </button>
+              </div>
+            </td>
+            <td>
+              <button
+                class="btn btn-link btn-sm text-secondary p-0"
+                (click)="removeItem(item.product_id)"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <button
+        class="btn btn-outline-secondary btn-sm px-3"
+        [disabled]="currentPage === 1"
+        (click)="onPageChange(currentPage - 1)"
+      >
+        <i class="bi bi-chevron-left me-1"></i>
+        Previous
+      </button>
+
+      <div class="d-flex gap-2">
+        <button
+          *ngFor="let page of getPageNumbers()"
+          class="btn btn-sm px-3"
+          [class.btn-primary]="page === currentPage"
+          [class.btn-outline-secondary]="page !== currentPage"
+          (click)="onPageChange(page)"
+        >
+          {{ page }}
+        </button>
+      </div>
+
+      <button
+        class="btn btn-outline-secondary btn-sm px-3"
+        [disabled]="currentPage === totalPages"
+        (click)="onPageChange(currentPage + 1)"
+      >
+        Next
+        <i class="bi bi-chevron-right ms-1"></i>
+      </button>
+    </div>
+
+    <!-- Footer Actions -->
+    <div
+      class="d-flex justify-content-between align-items-center mt-4 pt-4 border-top"
+    >
+      <button type="button" class="btn btn-outline-secondary px-4">
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary px-4"
+        style="background-color: #000000; border-color: #000000"
+        (click)="moveToCart()"
+      >
+        Move
+      </button>
+    </div>
+  </div>
+</div>

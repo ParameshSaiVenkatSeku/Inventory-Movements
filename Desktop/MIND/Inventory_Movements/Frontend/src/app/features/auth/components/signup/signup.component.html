@@ -1,0 +1,130 @@
+<div class="container vh-100 d-flex align-items-center justify-content-center">
+  <div class="row w-100">
+    <div class="col-md-6 d-flex flex-column justify-content-center p-5">
+      <h1 class="mb-3">Sign Up</h1>
+      <p class="text-muted mb-4">Explore the new era of technology!</p>
+
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label for="firstName" class="form-label">First Name*</label>
+          <input
+            type="text"
+            id="firstName"
+            class="form-control"
+            formControlName="firstName"
+            placeholder="Enter your first name"
+          />
+          <div
+            *ngIf="
+              signupForm.get('firstName')?.invalid &&
+              signupForm.get('firstName')?.touched
+            "
+            class="text-danger"
+          >
+            <small>First name is required.</small>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="lastName" class="form-label">Last Name*</label>
+          <input
+            type="text"
+            id="lastName"
+            class="form-control"
+            formControlName="lastName"
+            placeholder="Enter your last name"
+          />
+          <div
+            *ngIf="
+              signupForm.get('lastName')?.invalid &&
+              signupForm.get('lastName')?.touched
+            "
+            class="text-danger"
+          >
+            <small>Last name is required.</small>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label">Email*</label>
+          <input
+            type="email"
+            id="email"
+            class="form-control"
+            formControlName="email"
+            placeholder="Enter your email"
+          />
+          <div
+            *ngIf="
+              signupForm.get('email')?.invalid &&
+              signupForm.get('email')?.touched
+            "
+            class="text-danger"
+          >
+            <small *ngIf="signupForm.get('email')?.errors?.['required']"
+              >Email is required.</small
+            >
+            <small *ngIf="signupForm.get('email')?.errors?.['email']"
+              >Invalid email address.</small
+            >
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="password" class="form-label">Password*</label>
+          <input
+            type="password"
+            id="password"
+            class="form-control"
+            formControlName="password"
+            placeholder="Create a password"
+          />
+          <div
+            *ngIf="
+              signupForm.get('password')?.invalid &&
+              signupForm.get('password')?.touched
+            "
+            class="text-danger"
+          >
+            <small *ngIf="signupForm.get('password')?.errors?.['required']"
+              >Password is required.</small
+            >
+            <small *ngIf="signupForm.get('password')?.errors?.['minlength']">
+              Password must be at least 8 characters.
+            </small>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary w-100"
+          [disabled]="signupForm.invalid"
+        >
+          Create Account
+        </button>
+      </form>
+
+      <p class="mt-3 text-center">
+        Already have an account?
+        <a routerLink="/auth/login" class="text-primary text-decoration-none"
+          >Log In</a
+        >
+      </p>
+    </div>
+
+    <div class="col-md-6 d-none d-md-block">
+      <div class="position-relative text-center">
+        <img
+          src="assets/images/signupimg.jpg"
+          class="img-fluid full-height-image"
+          alt="Signup Graphic"
+        />
+
+        <blockquote
+          class="blockquote position-absolute top-50 start-50 translate-middle text-white"
+          style="width: 80%"
+        ></blockquote>
+      </div>
+    </div>
+  </div>
+</div>

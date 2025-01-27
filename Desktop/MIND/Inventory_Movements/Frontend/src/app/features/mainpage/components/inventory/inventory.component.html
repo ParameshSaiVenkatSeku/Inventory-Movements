@@ -1,0 +1,382 @@
+<div class="card">
+  <div class="card-header bg-white">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h5 class="mb-0">Inventory Movements</h5>
+        <small class="text-muted">{{ productData?.length }} Products</small>
+      </div>
+      <div *ngIf="!showCart">
+        <button
+          class="btn btn-light border border-secondary me-2"
+          (click)="move()"
+          data-bs-toggle="modal"
+          data-bs-target="#moveToCartModal"
+        >
+          Move to cart
+        </button>
+        <button
+          class="btn btn-light me-2 border border-secondary"
+          (click)="download()"
+        >
+          Download All
+        </button>
+        <button
+          class="btn btn-light me-2 border border-secondary"
+          (click)="triggerFileInput()"
+        >
+          <i class="bi bi-upload"></i> Import
+        </button>
+        <input
+          type="file"
+          #fileInput
+          (change)="handleFileInput($event)"
+          accept=".xls,.xlsx"
+          style="display: none"
+        />
+
+        <button
+          class="btn btn-primary violet-button"
+          data-bs-toggle="modal"
+          data-bs-target="#addProductModal"
+        >
+          + Add Product
+        </button>
+      </div>
+    </div>
+    <div class="mt-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="btn-group">
+          <button
+            class="btn btn-light active border border-secondary"
+            (click)="onView()"
+            [class.active]="!showCart"
+          >
+            View all
+          </button>
+          <button
+            class="btn btn-light border border-secondary"
+            (click)="onCart()"
+            [class.active]="showCart"
+          >
+            Cart
+          </button>
+        </div>
+        <div class="d-flex gap-2">
+          <div class="position-relative">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Search"
+              style="padding-left: 35px; width: 250px"
+              [(ngModel)]="searchTerm"
+              (input)="filterSearch($event)"
+            />
+            <i
+              class="bi bi-search position-absolute"
+              style="left: 12px; top: 50%; transform: translateY(-50%)"
+            ></i>
+          </div>
+          <button
+            class="btn btn-light d-flex align-items-center gap-2"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i class="bi bi-funnel"></i> Filters
+          </button>
+          <div class="dropdown">
+            <div class="dropdown-menu p-3" style="min-width: 250px">
+              <h6 class="dropdown-header px-0 text-dark fw-bold">Columns</h6>
+              <select
+                class="form-select"
+                aria-label="Select column to filter"
+                id="filterColumn"
+                [(ngModel)]="this.filterData.category_name"
+                (change)="searchCategory()"
+              >
+                <option value="Electronics" selected>Electronics</option>
+                <option value="Furniture">Furniture</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Food & Beverages">Food & Beverages</option>
+                <option value="Health & Beauty">Health & Beauty</option>
+                <option value="Sports & Outdoors">Sports & Outdoors</option>
+                <option value="Toys & Games">Toys & Games</option>
+                <option value="Office Supplies">Office Supplies</option>
+                <option value="Books & Stationery">Books & Stationery</option>
+              </select>
+              <button class="btn btn-secondary mt-2" (click)="resetFilter()">
+                Reset Filter
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-body" *ngIf="!showCart">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Product Name</th>
+            <th>Status <i class="bi bi-chevron-down ms-1"></i></th>
+            <th>Category <i class="bi bi-info-circle ms-1"></i></th>
+            <th>Vendors</th>
+            <th>Quantity</th>
+            <th>Unit</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of productData">
+            <td>
+              <input
+                type="checkbox"
+                [checked]="item.checked"
+                (click)="cartchange(item, $event)"
+              />
+            </td>
+            <td>
+              <div class="d-flex align-items-center">
+                <img
+                  src="{{ item?.product_image }}"
+                  class="rounded me-2"
+                  alt="Product"
+                  style="width: 40px; height: 40px; object-fit: cover"
+                />
+                <span>{{ item?.product_name }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="badge text-bg-danger" *ngIf="item?.status == '0'"
+                >Sold Out</span
+              >
+              <span class="badge text-bg-success" *ngIf="item?.status == '1'"
+                >Available</span
+              >
+            </td>
+            <td>{{ item?.category_name }}</td>
+            <td>
+              <span class="badge bg-light text-dark me-1">{{
+                item?.vendor_name
+              }}</span>
+            </td>
+            <td>{{ item?.quantity_in_stock }}</td>
+            <td>{{ item?.unit_price }}</td>
+            <td>
+              <button
+                class="btn btn-light btn-sm me-1"
+                (click)="downloadPDF(item)"
+              >
+                <i class="bi bi-download"></i>
+              </button>
+              <button
+                class="btn btn-light btn-sm me-1"
+                (click)="openDeleteModal(item?.product_id)"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteModal"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+              <button
+                class="btn btn-light btn-sm"
+                data-bs-toggle="modal"
+                data-bs-target="#editProductModal"
+                (click)="onproductedit(item)"
+              >
+                <i class="bi bi-pencil"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <button
+        class="btn btn-light d-flex align-items-center gap-2"
+        [disabled]="pageNo === 1"
+        (click)="navigateToPage(pageNo - 1)"
+      >
+        <i class="bi bi-chevron-left"></i> Previous
+      </button>
+      <div class="d-flex align-items-center gap-2">
+        <button
+          *ngFor="let page of getPageNumbers()"
+          class="btn"
+          [ngClass]="{
+            'btn-black': page === pageNo,
+            'btn-light-black': page !== pageNo
+          }"
+          (click)="navigateToPage(page)"
+        >
+          {{ page }}
+        </button>
+      </div>
+      <button
+        class="btn btn-light d-flex align-items-center gap-2"
+        [disabled]="pageNo === totalPage"
+        (click)="navigateToPage(pageNo + 1)"
+      >
+        Next <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="card-body" *ngIf="showCart">
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Product Name</th>
+          <th>Vendors</th>
+          <th>Quantity</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of cartItems">
+          <td>{{ item.product_name }}</td>
+          <td>{{ item.vendor_name }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>
+            <button
+              class="btn btn-danger btn-sm"
+              (click)="removeFromCart(item)"
+            >
+              <i class="bi bi-trash3"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="moveToCartModal"
+  tabindex="-1"
+  aria-labelledby="moveToCartModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="moveToCartModalLabel">Move to Cart</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <app-cart></app-cart>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="addProductModal"
+  tabindex="-1"
+  aria-labelledby="addProductModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5
+          class="modal-title"
+          id="addProductModalLabel"
+          data-bs-dismiss="modal"
+        >
+          Add Product
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <app-product-form
+          (formSubmitted)="handleform($event)"
+        ></app-product-form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="editProductModal"
+  tabindex="-1"
+  aria-labelledby="addProductModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <app-product-form (formSubmitted)="editform($event)"></app-product-form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="deleteModal"
+  tabindex="-1"
+  [ngClass]="{ show: showModal }"
+  [ngStyle]="{ display: showModal ? 'block' : 'none' }"
+  aria-labelledby="deleteModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete Product</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+          (click)="closeDeleteModal()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this product?</p>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeDeleteModal()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="confirmDelete()"
+          data-bs-dismiss="modal"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
