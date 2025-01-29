@@ -123,8 +123,18 @@ const getAllProducts = async (req, res, next) => {
       status,
       page = 1,
       limit = 5,
+      searchText,
+      filters,
     } = req.query;
     const offset = (page - 1) * limit;
+    let selectedFilters = {};
+    if (filters) {
+      try {
+        selectedFilters = JSON.parse(filters);
+      } catch (error) {
+        return res.status(400).json({ message: "Invalid filters format" });
+      }
+    }
 
     const productsData = db("products as p")
       .select(
@@ -142,12 +152,26 @@ const getAllProducts = async (req, res, next) => {
       .leftJoin("vendors as v", "pv.vendor_id", "v.vendor_id")
       .groupBy("p.product_id");
 
-    if (product_name) {
-      productsData.where("p.product_name", "like", `%${product_name}%`);
+    if (searchText) {
+      productsData.where((qb) => {
+        qb.where("p.product_name", "like", `%${searchText}%`)
+          .orWhere("c.category_name", "like", `%${searchText}%`)
+          .orWhere("v.vendor_name", "like", `%${searchText}%`);
+      });
     }
-    if (category_name) {
-      productsData.where("c.category_name", "like", `%${category_name}%`);
-    }
+
+    Object.keys(selectedFilters).forEach((key) => {
+      if (selectedFilters[key] && key !== "filters") {
+        if (key === "category_name") {
+          productsData.where("c.category_name", "like", `%${category_name}%`);
+        } else if (key === "product_name") {
+          productsData.where("p.product_name", "like", `%${product_name}%`);
+        } else if (key === "vendor_name") {
+          productsData.where("v.vendor_name", "like", `%${searchText}%`);
+        }
+      }
+    });
+
     if (status) {
       productsData.where("p.status", status);
     } else {
@@ -164,7 +188,7 @@ const getAllProducts = async (req, res, next) => {
         await db("products")
           .where("product_id", product.product_id)
           .update({ status: "0" });
-        product.status = "0"; // Update the status in the response as well
+        product.status = "0";
       }
     }
 
@@ -189,15 +213,13 @@ const getAllProducts = async (req, res, next) => {
       .count("p.product_id as count")
       .whereIn("p.status", ["0", "1"]);
 
-    // console.log(result.length);
-
     const totalCount = result.length;
 
     const totalPage = Math.ceil(totalCount / limit);
 
     return res.status(200).json({
       data: products,
-      paggination: {
+      pagination: {
         totalCount,
         currentPage: parseInt(page),
         totalPage,

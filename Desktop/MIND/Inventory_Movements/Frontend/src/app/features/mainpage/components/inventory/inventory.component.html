@@ -68,41 +68,57 @@
               class="form-control"
               placeholder="Search"
               style="padding-left: 35px; width: 250px"
-              [(ngModel)]="searchTerm"
-              (input)="filterSearch($event)"
+              [(ngModel)]="searchText"
+              (ngModelChange)="handleModelChanges()"
             />
             <i
               class="bi bi-search position-absolute"
               style="left: 12px; top: 50%; transform: translateY(-50%)"
             ></i>
           </div>
+
           <button
             class="btn btn-light d-flex align-items-center gap-2"
             data-bs-toggle="dropdown"
             aria-expanded="false"
-            *ngIf="filter"
+            (click)="toggleDropdown()"
           >
             <i class="bi bi-funnel"></i> Filters
           </button>
-          <div class="dropdown">
+
+          <div class="dropdown" *ngIf="isDropdownOpen">
             <div class="dropdown-menu p-3" style="min-width: 250px">
               <h6 class="dropdown-header px-0 text-dark fw-bold">Columns</h6>
-              <select
-                class="form-select"
-                aria-label="Select column to filter"
-                id="filterColumn"
-                [(ngModel)]="this.filterData.category_name"
-                (change)="searchByColumns()"
-              >
-                <option value="Product_Name" selected>Product Name</option>
-                <option value="Category">Category</option>
-                <option value="Vendor">Vendor</option>
-                <option value="Quantity">Quantity</option>
-                <option value="Price">Unit Price</option>
-              </select>
-              <button class="btn btn-secondary mt-2" (click)="resetFilter()">
-                Reset Filter
-              </button>
+
+              <ul class="list-unstyled">
+                <li>
+                  <label class="d-flex align-items-center">
+                    <input
+                      type="checkbox"
+                      (change)="onCheckboxChange('category_name', $event)"
+                    />
+                    <span class="ms-2">Category</span>
+                  </label>
+                </li>
+                <li>
+                  <label class="d-flex align-items-center">
+                    <input
+                      type="checkbox"
+                      (change)="onCheckboxChange('vendor_name', $event)"
+                    />
+                    <span class="ms-2">Vendors</span>
+                  </label>
+                </li>
+                <li>
+                  <label class="d-flex align-items-center">
+                    <input
+                      type="checkbox"
+                      (change)="onCheckboxChange('product_name', $event)"
+                    />
+                    <span class="ms-2">Product Name</span>
+                  </label>
+                </li>
+              </ul>
             </div>
           </div>
         </div>

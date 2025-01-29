@@ -10,7 +10,6 @@ const db = knex(knexConfig);
 Model.knex(db);
 const JWT_SECRET = "AkriviaHCM";
 const Refresh_secret = "AkriviaAutomation";
-const CryptoJS = require("crypto-js");
 
 function generateAccessToken(user) {
   return jwt.sign(
@@ -58,8 +57,6 @@ const CreateUser = asyncErrorHandler(async (req, res) => {
       email,
       status: "0",
     });
-
-    // console.log("User created with ID:", user_id);
 
     res.status(201).json({
       message: "User created successfully",

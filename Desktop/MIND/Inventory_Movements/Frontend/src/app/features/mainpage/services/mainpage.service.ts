@@ -99,13 +99,21 @@ export class MainpageService {
     this.sendToCart.next(items);
   }
 
-  filterProduct(filter: any, limit: any, pageno: any) {
+  filterProduct(
+    filter: any,
+    limit: any,
+    pageno: any,
+    searchText: any,
+    store: any
+  ) {
     let params = new HttpParams()
       .set('product_name', filter.product_name || '')
       .set('category_name', filter.category_name || '')
       .set('status', filter.status || '')
       .set('limit', limit.toString())
-      .set('page', pageno.toString());
+      .set('page', pageno.toString())
+      .set('searchText', searchText)
+      .set('filters', JSON.stringify(store));
     return this.http.get(`${environment.Url}/dashboard/filterProduct`, {
       params,
     });

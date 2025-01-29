@@ -5,7 +5,6 @@ const { Model } = require("objection");
 const knexConfig = require("./../../knexfile");
 const db = knex(knexConfig);
 Model.knex(db);
-const JWT_SECRET = "AkriviaHCM";
 
 const getUser = async (req, res) => {
   try {

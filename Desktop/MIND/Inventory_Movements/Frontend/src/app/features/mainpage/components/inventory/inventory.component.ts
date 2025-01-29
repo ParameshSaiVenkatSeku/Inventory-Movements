@@ -170,7 +170,6 @@ export class InventoryComponent implements OnInit {
   ngOnInit(): void {
     this.subject.pipe(debounceTime(300)).subscribe((data) => {
       console.log(data);
-      this.filterSearch(data);
     });
 
     this.getCartData();
@@ -231,14 +230,25 @@ export class InventoryComponent implements OnInit {
   }
 
   fetchData() {
+    const store = Object.keys(this.selectedFilters).filter(
+      (key) => this.selectedFilters[key]
+    );
+
+    console.log(store);
     this.main
-      .filterProduct(this.filterData, this.limit, this.pageNo)
+      .filterProduct(
+        this.filterData,
+        this.limit,
+        this.pageNo,
+        this.searchText,
+        store
+      )
       .subscribe({
         next: (res: any) => {
           console.log(res);
           this.productData = res.data;
-          this.totalPage = res.paggination.totalPage;
-          this.totalcount = res.paggination.totalCount;
+          this.totalPage = res.pagination.totalPage;
+          this.totalcount = res.pagination.totalCount;
         },
         error: (error) => console.log(error, 'filter error'),
       });
@@ -252,22 +262,6 @@ export class InventoryComponent implements OnInit {
       page: this.pageNo,
     };
     this.main.updateQueryparam(params);
-  }
-
-  searchByColumns() {
-    this.fetchData();
-    this.updateQuery();
-  }
-
-  filterSearch(event: any) {
-    this.filterData.product_name = event.target.value;
-    this.fetchData();
-    this.updateQuery();
-  }
-
-  resetFilter() {
-    this.filterData.category_name = '';
-    this.searchByColumns();
   }
 
   showModal = false;
@@ -457,5 +451,21 @@ export class InventoryComponent implements OnInit {
       }
       this.toastr.success('Data Successfully Updated', 'Success');
     }
+  }
+  isDropdownOpen = false;
+  selectedFilters: { [key: string]: boolean } = {};
+  searchText?: string = '';
+
+  toggleDropdown() {
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
+
+  onCheckboxChange(filter: string, event: Event) {
+    const checkbox = event.target as HTMLInputElement;
+    this.selectedFilters[filter] = checkbox.checked;
+  }
+
+  handleModelChanges() {
+    this.fetchData();
   }
 }

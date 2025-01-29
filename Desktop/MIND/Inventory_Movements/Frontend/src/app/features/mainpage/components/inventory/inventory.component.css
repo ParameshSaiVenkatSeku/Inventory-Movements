@@ -43,3 +43,54 @@
   color: #000;
   border-color: #ccc;
 }
+
+.dropdown {
+  position: relative;
+
+  .btn {
+    background-color: #007bff;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    display: block;
+    padding: 0.5rem;
+    min-width: 200px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    li {
+      list-style: none;
+
+      label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+
+        input[type="checkbox"] {
+          margin: 0;
+        }
+
+        &:hover {
+          background-color: #f8f9fa;
+          border-radius: 4px;
+        }
+      }
+    }
+  }
+}
