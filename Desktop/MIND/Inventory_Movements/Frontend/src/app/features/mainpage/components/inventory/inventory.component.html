@@ -3,11 +3,11 @@
     <div class="d-flex justify-content-between align-items-center">
       <div>
         <h5 class="mb-0">Inventory Movements</h5>
-        <small class="text-muted">{{ productData?.length }} Products</small>
+        <small class="text-muted">{{ totalcount }} Products</small>
       </div>
       <div *ngIf="!showCart">
         <button
-          class="btn btn-light border border-secondary me-2"
+          class="on-hover btn btn-info border border-secondary me-2"
           (click)="move()"
           data-bs-toggle="modal"
           data-bs-target="#moveToCartModal"
@@ -15,13 +15,13 @@
           Move to cart
         </button>
         <button
-          class="btn btn-light me-2 border border-secondary"
+          class="on-hover btn btn-info me-2 border border-secondary"
           (click)="download()"
         >
           Download All
         </button>
         <button
-          class="btn btn-light me-2 border border-secondary"
+          class="on-hover btn btn-info me-2 border border-secondary"
           (click)="triggerFileInput()"
         >
           <i class="bi bi-upload"></i> Import
@@ -47,14 +47,14 @@
       <div class="d-flex justify-content-between align-items-center">
         <div class="btn-group">
           <button
-            class="btn btn-light active border border-secondary"
+            class="on-hover btn btn-light-black active border border-secondary"
             (click)="onView()"
             [class.active]="!showCart"
           >
             View all
           </button>
           <button
-            class="btn btn-light border border-secondary"
+            class="on-hover btn btn-light-black border border-secondary"
             (click)="onCart()"
             [class.active]="showCart"
           >
@@ -80,6 +80,7 @@
             class="btn btn-light d-flex align-items-center gap-2"
             data-bs-toggle="dropdown"
             aria-expanded="false"
+            *ngIf="filter"
           >
             <i class="bi bi-funnel"></i> Filters
           </button>
@@ -91,17 +92,13 @@
                 aria-label="Select column to filter"
                 id="filterColumn"
                 [(ngModel)]="this.filterData.category_name"
-                (change)="searchCategory()"
+                (change)="searchByColumns()"
               >
-                <option value="Electronics" selected>Electronics</option>
-                <option value="Furniture">Furniture</option>
-                <option value="Clothing">Clothing</option>
-                <option value="Food & Beverages">Food & Beverages</option>
-                <option value="Health & Beauty">Health & Beauty</option>
-                <option value="Sports & Outdoors">Sports & Outdoors</option>
-                <option value="Toys & Games">Toys & Games</option>
-                <option value="Office Supplies">Office Supplies</option>
-                <option value="Books & Stationery">Books & Stationery</option>
+                <option value="Product_Name" selected>Product Name</option>
+                <option value="Category">Category</option>
+                <option value="Vendor">Vendor</option>
+                <option value="Quantity">Quantity</option>
+                <option value="Price">Unit Price</option>
               </select>
               <button class="btn btn-secondary mt-2" (click)="resetFilter()">
                 Reset Filter
@@ -119,7 +116,7 @@
           <tr>
             <th>#</th>
             <th>Product Name</th>
-            <th>Status <i class="bi bi-chevron-down ms-1"></i></th>
+            <th>Status</th>
             <th>Category <i class="bi bi-info-circle ms-1"></i></th>
             <th>Vendors</th>
             <th>Quantity</th>
@@ -244,6 +241,7 @@
               class="btn btn-danger btn-sm"
               (click)="removeFromCart(item)"
             >
+              <span class="text-light">Remove</span>&nbsp;
               <i class="bi bi-trash3"></i>
             </button>
           </td>

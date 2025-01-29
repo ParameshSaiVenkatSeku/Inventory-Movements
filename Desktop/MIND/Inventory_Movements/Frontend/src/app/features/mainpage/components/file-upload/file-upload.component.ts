@@ -1,12 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { MainpageService } from '../../services/mainpage.service';
-import { Router } from '@angular/router';
 import { AwsService } from '../../services/aws.service';
 import * as JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import * as XLSX from 'xlsx';
-import { ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 @Component({
@@ -29,10 +27,8 @@ export class FileUploadComponent implements OnInit {
   constructor(
     private main: MainpageService,
     private http: HttpClient,
-    private router: Router,
     private aws: AwsService,
     private sanitizer: DomSanitizer,
-    private cdr: ChangeDetectorRef,
     private toastr: ToastrService
   ) {}
 
@@ -106,7 +102,6 @@ export class FileUploadComponent implements OnInit {
   downloadAllSelected(): void {
     const selectedFiles = this.files.filter((file) => file.selected);
     if (selectedFiles.length === 0) {
-      // alert('Please select files to download.');
       this.toastr.error('Please Select Files to Download', 'Error');
       return;
     }
@@ -145,7 +140,6 @@ export class FileUploadComponent implements OnInit {
     if (input.files && input.files[0]) {
       this.selectedFile = input.files[0];
       console.log(this.selectedFile);
-      // this.previewFile(this.selectedFile);
     }
   }
 
@@ -236,8 +230,9 @@ export class FileUploadComponent implements OnInit {
     if (this.selectedFile) {
       this.aws.uploadFileToS3(presignedUrl, this.selectedFile).subscribe({
         next: (res: any) => {
-          console.log('File successfully uploaded to S3');
+          this.toastr.success('File uploaded successfully', 'Success');
           this.loadFiles();
+          this.selectedFile = null;
         },
         error: (error) => {
           console.error('Error uploading file:', error);

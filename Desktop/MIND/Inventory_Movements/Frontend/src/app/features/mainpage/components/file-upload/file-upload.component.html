@@ -1,9 +1,9 @@
 <div class="card">
   <div class="card-header bg-white">
-    <h5 class="mb-2">Files uploaded</h5>
+    <h5 class="mb-2">File Uploads</h5>
     <div class="d-flex gap-2">
       <button
-        class="btn btn-light border-secondary"
+        class="on-hover btn btn-info border-secondary"
         (click)="downloadAllSelected()"
       >
         Download all
@@ -137,11 +137,6 @@
           <p>
             <strong>File Size:</strong> {{ selectedFile.size | number }} bytes
           </p>
-          <!-- <p><strong>File Type:</strong> {{ selectedFile.type }}</p>
-          <p>
-            <strong>Last Modified:</strong>
-            {{ selectedFile.lastModified | date : "short" }}
-          </p> -->
         </div>
 
         <div class="d-flex justify-content-end gap-2">

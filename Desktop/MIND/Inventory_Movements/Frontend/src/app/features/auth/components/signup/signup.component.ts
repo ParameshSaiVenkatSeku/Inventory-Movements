@@ -3,7 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { AuthserviceService } from '../../services/authservice.service';
-import * as CryptoJS from 'crypto-js';
+
 @Component({
   selector: 'app-signup',
   standalone: false,

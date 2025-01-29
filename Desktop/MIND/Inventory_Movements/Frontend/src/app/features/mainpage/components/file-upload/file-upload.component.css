@@ -91,8 +91,13 @@
   text-align: left;
 }
 
+.on-hover:hover {
+  background-color: rgb(130, 190, 190);
+}
+
 .excel-preview-table th {
-  background-color: #f4f4f4;
+  background-color: black;
+  color: white;
   font-weight: bold;
 }
 

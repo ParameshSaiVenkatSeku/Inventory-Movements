@@ -1,8 +1,6 @@
-
 const knex = require("knex");
-const { Model, val } = require("objection");
+const { Model } = require("objection");
 const knexConfig = require("./../../knexfile");
-const jwt = require("jsonwebtoken");
 const db = knex(knexConfig);
 Model.knex(db);
 const categories = async (req, res) => {
@@ -12,6 +10,3 @@ const categories = async (req, res) => {
   });
 };
 module.exports = categories;
-
-
-

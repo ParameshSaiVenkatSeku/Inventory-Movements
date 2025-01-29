@@ -7,11 +7,10 @@ import { RouterModule } from '@angular/router';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpInterceptorInterceptor } from './features/auth/interceptors/http-interceptor.interceptor';
-import { FilterPipe } from './filter.pipe';
+import { AuthInterceptor } from './features/auth/interceptors/http-interceptor.interceptor';
 
 @NgModule({
-  declarations: [AppComponent, FilterPipe],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -22,8 +21,8 @@ import { FilterPipe } from './filter.pipe';
     HttpClientModule,
     ToastrModule.forRoot({
       positionClass: 'toast-top-right',
-      timeOut: 3000,
-      extendedTimeOut: 1000,
+      timeOut: 1000,
+      extendedTimeOut: 500,
       closeButton: true,
       progressBar: true,
     }),
@@ -31,7 +30,7 @@ import { FilterPipe } from './filter.pipe';
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: HttpInterceptorInterceptor,
+      useClass: AuthInterceptor,
       multi: true,
     },
   ],

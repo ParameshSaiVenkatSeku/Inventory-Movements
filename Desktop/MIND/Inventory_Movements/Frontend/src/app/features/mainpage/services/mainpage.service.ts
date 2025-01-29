@@ -4,6 +4,8 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { AuthserviceService } from '../../auth/services/authservice.service';
 import { environment } from 'src/environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -16,7 +18,8 @@ export class MainpageService {
     private http: HttpClient,
     private authSer: AuthserviceService,
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private toastr: ToastrService
   ) {}
 
   private sendToCartSubject = new BehaviorSubject<any[]>([]);
@@ -26,6 +29,7 @@ export class MainpageService {
   updateCart(data: any[]): void {
     this.sendToCartSubject.next(data);
   }
+
   getUserInfo(): Observable<any> {
     const token = this.authSer.getToken();
     const headers = new HttpHeaders({
@@ -83,7 +87,7 @@ export class MainpageService {
 
   editproduct(edit: any) {
     console.log(edit);
-    return this.http.put(`${environment.Url}/dashboard/product`, edit);
+    return this.http.post(`${environment.Url}/dashboard/product`, edit);
   }
 
   setdata(item: any) {
@@ -106,6 +110,7 @@ export class MainpageService {
       params,
     });
   }
+
   updateQueryparam(params: any) {
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
@@ -113,14 +118,17 @@ export class MainpageService {
       queryParamsHandling: 'merge',
     });
   }
+
   getqueryParam(): Observable<any> {
     return this.activatedRoute.queryParams;
   }
+
   addproducts(productData: any) {
     return this.http
       .post(`${environment.Url}/dashboard/product`, productData)
       .subscribe(
         (data) => {
+          this.toastr.success('Product Added Successfully', 'Success');
           console.log('New product added:', data);
         },
         (error) => {

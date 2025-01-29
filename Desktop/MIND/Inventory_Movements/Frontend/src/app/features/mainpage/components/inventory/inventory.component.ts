@@ -4,7 +4,7 @@ import { environment } from 'src/environments/environment';
 import * as xlsx from 'xlsx';
 import { jsPDF } from 'jspdf';
 import { MainpageService } from '../../services/mainpage.service';
-import { debounce, debounceTime, Subject } from 'rxjs';
+import { debounceTime, Subject } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 
 interface cartData {
@@ -38,7 +38,10 @@ export class InventoryComponent implements OnInit {
   ];
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
   subject = new Subject<any>();
+  filter: boolean = true;
+
   triggerFileInput(): void {
     if (this.fileInput) {
       this.fileInput.nativeElement.click();
@@ -54,14 +57,13 @@ export class InventoryComponent implements OnInit {
       reader.onload = (e) => {
         const data = new Uint8Array(e.target?.result as ArrayBuffer);
         const workbook = xlsx.read(data, { type: 'array' });
-        const sheetName = workbook.SheetNames[0]; // Get the first sheet
+        const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         const jsonData = xlsx.utils.sheet_to_json(sheet, { defval: '' }); // Convert to JSON
 
         if (this.validateColumns(Object.keys(jsonData[0] as object))) {
           this.uploadExcelData(jsonData);
         } else {
-          // alert('Invalid Excel format. Please ensure the columns are correct.');
           this.toastr.error('Invalid Excel format', 'Error');
         }
       };
@@ -78,12 +80,10 @@ export class InventoryComponent implements OnInit {
         .subscribe(
           (response) => {
             console.log('Data successfully uploaded to the backend:', response);
-            // alert('Data successfully uploaded!');
             this.toastr.success('Data successfully uploaded', 'Success');
           },
           (error) => {
             console.error('Error uploading Excel data to the backend:', error);
-            // alert('Error uploading Excel data. Please try again.');
             this.toastr.error('Error uploading excel data', 'Error');
           }
         );
@@ -108,23 +108,27 @@ export class InventoryComponent implements OnInit {
 
   removeFromCart(item: any) {
     console.log(item);
-    const url = `http://localhost:3000/dashboard/deleteItem/${item.product_id}`;
-
-    this.http.delete(url).subscribe({
-      next: (response) => {
-        console.log('Item deleted:', response);
-        this.fetchData();
-        this.getCartData();
-      },
-      error: (error) => {
-        console.error('Error deleting item:', error);
-        // Handle the error (e.g., display an error message)
-      },
-    });
+    this.http
+      .delete(`${environment.Url}/dashboard/deleteItem/${item.product_id}`, {
+        body: { vendorName: item.vendor_name }, // Add vendor name in the body
+      })
+      .subscribe({
+        next: (response) => {
+          console.log('Item deleted:', response);
+          this.toastr.success('Item deleted successfully', 'Success');
+          this.fetchData();
+          this.getCartData();
+        },
+        error: (error) => {
+          console.error('Error deleting item:', error);
+        },
+      });
   }
+
   toggleCartItem(_t124: any) {
     throw new Error('Method not implemented.');
   }
+
   closeDeleteModal() {
     throw new Error('Method not implemented.');
   }
@@ -137,7 +141,7 @@ export class InventoryComponent implements OnInit {
 
   productData: any;
   pageNo = 1;
-  limit = 10;
+  limit = 5;
   selectedItems: any[] = [];
   totalPage = 1;
   totalcount = 0;
@@ -148,7 +152,6 @@ export class InventoryComponent implements OnInit {
   products: any;
   selectedFile: File | null = null;
   productToDelete: number | null = null;
-  // searchTerm:string='';
 
   files = [
     { name: 'Tech requirements.pdf', size: '200 KB' },
@@ -167,8 +170,7 @@ export class InventoryComponent implements OnInit {
   ngOnInit(): void {
     this.subject.pipe(debounceTime(300)).subscribe((data) => {
       console.log(data);
-
-      this.filterSearch1(data);
+      this.filterSearch(data);
     });
 
     this.getCartData();
@@ -189,7 +191,7 @@ export class InventoryComponent implements OnInit {
   }
 
   getCartData(): void {
-    this.http.get(`${environment.Url}/get-cart`).subscribe(
+    this.http.get(`${environment.Url}/dashboard/cartData`).subscribe(
       (response: any) => {
         this.cartItems = response.data;
       },
@@ -201,10 +203,12 @@ export class InventoryComponent implements OnInit {
 
   onCart() {
     this.showCart = true;
+    this.filter = false;
   }
 
   onView() {
     this.showCart = false;
+    this.filter = true;
   }
 
   move() {
@@ -231,7 +235,7 @@ export class InventoryComponent implements OnInit {
       .filterProduct(this.filterData, this.limit, this.pageNo)
       .subscribe({
         next: (res: any) => {
-          console.log(res.data);
+          console.log(res);
           this.productData = res.data;
           this.totalPage = res.paggination.totalPage;
           this.totalcount = res.paggination.totalCount;
@@ -250,32 +254,20 @@ export class InventoryComponent implements OnInit {
     this.main.updateQueryparam(params);
   }
 
-  searchCategory() {
+  searchByColumns() {
     this.fetchData();
     this.updateQuery();
   }
 
   filterSearch(event: any) {
-    // console.log(event);
-    // this.filterData.product_name = event.target.value;
-    // console.log(this.filterData);
-    // this.fetchData();
-    // this.updateQuery();
-    this.subject.next(event);
-
-    //this.fetchData();
-  }
-  filterSearch1(event: any) {
-    console.log(event);
     this.filterData.product_name = event.target.value;
-    console.log(this.filterData);
     this.fetchData();
     this.updateQuery();
   }
 
   resetFilter() {
     this.filterData.category_name = '';
-    this.searchCategory();
+    this.searchByColumns();
   }
 
   showModal = false;
@@ -335,24 +327,24 @@ export class InventoryComponent implements OnInit {
     doc.setFontSize(16);
     doc.text('Product Details', 20, 20);
     doc.setFontSize(12);
-    // console.log(product);
+    console.log(product);
     doc.text(`Product Name: ${product.product_name}`, 20, 30);
-    // console.log(product.product_name);
+    console.log(product.product_name);
     doc.text(`Category: ${product.category_name}`, 20, 40);
-    // console.log(product.category_name);
+    console.log(product.category_name);
     doc.text(
       `Status: ${product.status === '1' ? 'Available' : 'Sold Out'}`,
       20,
       50
     );
     doc.text(`Quantity: ${product.quantity_in_stock}`, 20, 60);
-    // console.log(product.quantity_in_stock);
+    console.log(product.quantity_in_stock);
     doc.text(`Unit: ${product.unit_price}`, 20, 70);
-    // console.log(product.unit_price);
+    console.log(product.unit_price);
     doc.text(`Vendors: ${product.vendor_name}`, 20, 80);
-    // console.log(product.vendor_name);
+    console.log(product.vendor_name);
     doc.text(`Image Url: ${product.product_image}`, 20, 90);
-    // console.log(product.product_image);
+    console.log(product.product_image);
     doc.save(`${product.product_name}_details.pdf`);
   }
 
@@ -398,7 +390,6 @@ export class InventoryComponent implements OnInit {
 
   editform(edit: any) {
     this.main.editproduct(edit).subscribe((data) => {
-      // alert('Product updated successfully');
       this.toastr.success('Product updated Successfully', 'Success');
     });
   }
@@ -438,13 +429,11 @@ export class InventoryComponent implements OnInit {
   onUpload(event: any): void {
     const file = event.target.files[0];
     if (!file) {
-      // alert('No file selected.');
       this.toastr.error('No File Selected', 'Error');
       return;
     }
     const fileType = file.name.split('.').pop();
     if (fileType !== 'xlsx' && fileType !== 'xls') {
-      // alert('Invalid file type. Please upload an Excel file.');
       this.toastr.error('Invalid File Type', 'Error');
       return;
     }
@@ -466,29 +455,7 @@ export class InventoryComponent implements OnInit {
       for (let items of this.data) {
         this.main.addproducts(items);
       }
-      // alert('Data successfully updated');
       this.toastr.success('Data Successfully Updated', 'Success');
     }
-  }
-  increaseCart(item: any) {}
-  decreaseCart(item: any) {
-    console.log(item);
-
-    const payload = {
-      product_name: item.product_name,
-    };
-    console.log(payload);
-    this.http
-      .post('http://localhost:3000/dashboard/cartData/decrease', payload)
-      .subscribe({
-        next: (response: any) => {
-          console.log('Quantity decreased successfully:', response);
-        },
-        error: (err) => {
-          console.error('Error decreasing quantity:', err);
-          // alert('Failed to decrease quantity');
-          this.toastr.error('Error Decreasing Quantity', 'Error');
-        },
-      });
   }
 }

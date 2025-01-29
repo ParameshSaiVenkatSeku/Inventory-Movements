@@ -24,10 +24,10 @@ exports.up = function (knex) {
       .onDelete("SET NULL");
     table.integer("status").defaultTo(1).checkIn([0, 1, 2, 99]);
     table.timestamps(true, true);
+    table.index(["product_name"]);
   });
 };
- 
+
 exports.down = function (knex) {
   return knex.schema.dropTableIfExists("cards");
 };
-

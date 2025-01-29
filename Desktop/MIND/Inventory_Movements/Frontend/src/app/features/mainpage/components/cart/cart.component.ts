@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MainpageService } from '../../services/mainpage.service';
 import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { AuthserviceService } from 'src/app/features/auth/services/authservice.service';
-
+import { Toast, ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-cart',
   standalone: false,
@@ -17,11 +16,12 @@ export class CartComponent implements OnInit {
   totalCount = 0;
   alertMessage: string = '';
   showAlert: boolean = false;
+  userId: number = 0;
 
   constructor(
     private main: MainpageService,
     private http: HttpClient,
-    private authService: AuthserviceService
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -29,12 +29,10 @@ export class CartComponent implements OnInit {
       this.cartData = data;
 
       this.cartData.forEach((item) => {
-        // Ensure quantity is valid
         if (isNaN(item.quantity) || item.quantity <= 0) {
           item.quantity = 1;
         }
 
-        // Split vendor names into an array
         item.vendorNames = item.vendor_name
           .split(',')
           .map((vendor: string) => vendor.trim());
@@ -58,8 +56,14 @@ export class CartComponent implements OnInit {
     }
   }
 
-  removeItem(id: string): void {
-    this.cartData = this.cartData.filter((item) => item.id !== id);
+  removeItem(productId: string): void {
+    this.cartData = this.cartData.filter(
+      (item) => item.product_id !== productId
+    );
+
+    this.totalCount = this.cartData.length;
+    this.totalPages = Math.ceil(this.totalCount / 10);
+    this.toastr.success('Item removed successfully!', 'Success');
   }
 
   getPageNumbers(): number[] {
@@ -73,21 +77,28 @@ export class CartComponent implements OnInit {
   onPageChange(page: number): void {
     this.currentPage = page;
   }
+
   async moveToCart() {
-    // selectedProducts = this.cartData.find((item) => item.checked);
     console.log(this.cartData);
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const token = sessionStorage.getItem('access_token');
+    if (token) {
+      this.userId = JSON.parse(atob(token.split('.')[1]));
+      console.log(this.userId, token);
+    } else {
+      console.error('No access token found');
+      return;
+    }
     for (let selectedProduct of this.cartData) {
       if (selectedProduct) {
         const payload = {
           productId: selectedProduct.product_id,
           quantity: selectedProduct.quantity,
           vendorName: selectedProduct.vendorId,
-          userId: user.id,
+          userId: this.userId,
         };
 
         await this.http
-          .post(`${environment.Url}/move-to-cart`, payload)
+          .post(`${environment.Url}/dashboard/move-to-cart`, payload)
           .subscribe(
             (response: any) => {
               console.log('Product moved to cart:', response);

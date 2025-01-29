@@ -1,8 +1,8 @@
 const knex = require("knex");
-const knexConfig = require("./../../knexfile");
+const knexConfig = require("../../knexfile");
 const db = knex(knexConfig);
 
-const postproduct = async (req, res) => {
+const postProduct = async (req, res) => {
   const {
     productId,
     productName,
@@ -14,10 +14,9 @@ const postproduct = async (req, res) => {
     productImage,
   } = req.body;
 
-  console.log(req.body);
+  // console.log(req.body);
   try {
     if (productId) {
-      // Update the product
       await db("products").where({ product_id: productId }).update({
         product_name: productName,
         category_id: category,
@@ -26,11 +25,11 @@ const postproduct = async (req, res) => {
         status: status,
       });
 
-      console.log("Product updated successfully");
+      // console.log("Product updated successfully");
 
       // Remove existing vendor associations for the product
       await db("product_to_vendor").where({ product_id: productId }).del();
-      console.log("Old vendor associations removed successfully.");
+      // console.log("Old vendor associations removed successfully.");
 
       // Insert new vendor associations
       const vendorData = vendor.map((v) => ({
@@ -40,7 +39,7 @@ const postproduct = async (req, res) => {
       }));
 
       await db("product_to_vendor").insert(vendorData);
-      console.log("Vendor associations updated successfully.");
+      // console.log("Vendor associations updated successfully.");
     } else {
       // Insert new product
       const [newProductId] = await db("products").insert(
@@ -54,7 +53,7 @@ const postproduct = async (req, res) => {
         },
         ["product_id"]
       );
-      console.log("Inserted product ID:", newProductId);
+      // console.log("Inserted product ID:", newProductId);
 
       // Insert vendor associations for the new product
       const vendorData = vendor.map((v) => ({
@@ -64,7 +63,7 @@ const postproduct = async (req, res) => {
       }));
 
       await db("product_to_vendor").insert(vendorData);
-      console.log("Vendor associations added successfully.");
+      // console.log("Vendor associations added successfully.");
     }
 
     // Fetch all products with their details and vendors
@@ -99,12 +98,12 @@ const deleteProduct = async (req, res) => {
     await db("products")
       .where("product_id", productId)
       .update({ status: "99" });
-    console.log("Product soft deleted successfully with ID:", productId);
+    // console.log("Product soft deleted successfully with ID:", productId);
 
     await db("product_to_vendor")
       .where("product_id", productId)
       .update({ status: "99" });
-    console.log("Soft Deleted vendor associations for product ID:", productId);
+    // console.log("Soft Deleted vendor associations for product ID:", productId);
     res.send({
       message: "Product soft deleted successfully",
     });
@@ -123,7 +122,7 @@ const getAllProducts = async (req, res, next) => {
       category_name,
       status,
       page = 1,
-      limit = 10,
+      limit = 5,
     } = req.query;
     const offset = (page - 1) * limit;
 
@@ -159,27 +158,40 @@ const getAllProducts = async (req, res, next) => {
     productsData.orderBy("c.category_name", "asc");
 
     const products = await productsData;
+    // console.log(products);
+    for (const product of products) {
+      if (product.quantity_in_stock === 0 && product.status !== "0") {
+        await db("products")
+          .where("product_id", product.product_id)
+          .update({ status: "0" });
+        product.status = "0"; // Update the status in the response as well
+      }
+    }
 
-    //pagination logic
-    const pagginationData = db("products as p")
+    const paginationData = db("products as p")
       .leftJoin("categories as c", "p.category_id", "c.category_id")
       .leftJoin("product_to_vendor as pv", "p.product_id", "pv.product_id")
       .leftJoin("vendors as v", "pv.vendor_id", "v.vendor_id");
 
     if (product_name) {
-      pagginationData.where("p.product_name", "like", `%${product_name}%`);
+      paginationData.where("p.product_name", "like", `%${product_name}%`);
     }
     if (category_name) {
-      pagginationData.where("c.category_name", "like", `%${category_name}%`);
+      paginationData.where("c.category_name", "like", `%${category_name}%`);
     }
     if (status) {
-      pagginationData.where("p.status", status);
+      paginationData.where("p.status", status);
     } else {
-      pagginationData.whereIn("p.status", ["0", "1", "2"]);
+      paginationData.whereIn("p.status", ["0", "1", "2"]);
     }
+    paginationData.groupBy("p.product_id");
+    const result = await paginationData
+      .count("p.product_id as count")
+      .whereIn("p.status", ["0", "1"]);
 
-    const result = await pagginationData.count("p.product_id as count");
-    const totalCount = result[0].count;
+    // console.log(result.length);
+
+    const totalCount = result.length;
 
     const totalPage = Math.ceil(totalCount / limit);
 
@@ -200,8 +212,9 @@ const getAllProducts = async (req, res, next) => {
   }
 };
 
-const updateimage = async (req, res) => {
+const updateImage = async (req, res) => {
   const { id, image } = req.body;
+  // console.log("dsjbdn", image, id);
   try {
     await db("products")
       .where({ product_id: id })
@@ -214,9 +227,9 @@ const updateimage = async (req, res) => {
 };
 
 const moveToCart = async (req, res) => {
-  console.log("Move to Cart route hit");
+  // console.log("Move to Cart route hit");
   const { productId, quantity, vendorName, userId } = req.body;
-  console.log(req.body);
+  // console.log(req.body);
 
   const trx = await db.transaction();
   try {
@@ -240,15 +253,14 @@ const moveToCart = async (req, res) => {
     const existingCartItem = await trx("product_cards")
       .where("product_id", productId)
       .andWhere("vendor_id", vendorId)
-      .andWhere("user_id", userId)
+      .andWhere("user_id", userId.user_id)
       .first();
-    console.log(existingCartItem);
 
     if (existingCartItem) {
       await trx("product_cards")
         .where("product_id", productId)
         .andWhere("vendor_id", vendorId)
-        .andWhere("user_id", userId)
+        .andWhere("user_id", userId.user_id)
         .update({
           quantity: existingCartItem.quantity + quantity,
         });
@@ -260,7 +272,7 @@ const moveToCart = async (req, res) => {
         quantity: quantity,
         vendor_id: vendorId,
         vendor_name: vendorName,
-        user_id: userId,
+        user_id: userId.user_id,
         status: 1,
       });
       console.log("Added product to cart");
@@ -283,7 +295,7 @@ const moveToCart = async (req, res) => {
 };
 
 const getCartData = async (req, res) => {
-  // console.log("dj");
+  console.log("dj");
   try {
     const cartItems = await db("product_cards").select(
       "product_id",
@@ -292,7 +304,7 @@ const getCartData = async (req, res) => {
       "vendor_name"
     );
 
-    // console.log(cartItems);
+    console.log(cartItems);
     res.status(200).send({ data: cartItems });
   } catch (error) {
     console.error("Error fetching cart data:", error);
@@ -303,13 +315,13 @@ const getCartData = async (req, res) => {
 const deleteCartData = async (req, res) => {
   try {
     const itemId = req.params.id;
-
+    const vendorName = req.body.vendorName;
     if (!itemId) {
       return res.status(400).send({ message: "Item ID is required" });
     }
 
     const cartItem = await db("product_cards")
-      .where("product_id", itemId)
+      .where({ product_id: itemId, vendor_name: vendorName })
       .select("quantity")
       .first();
 
@@ -320,7 +332,7 @@ const deleteCartData = async (req, res) => {
     const itemQuantity = cartItem.quantity;
 
     const deletedCount = await db("product_cards")
-      .where("product_id", itemId)
+      .where({ product_id: itemId, vendor_name: vendorName })
       .del();
 
     if (deletedCount === 0) {
@@ -371,17 +383,12 @@ const importData = async (req, res) => {
       }
 
       let category = await db("categories").where({ category_name }).first();
-
       if (!category) {
-        console.log(
-          `Category '${category_name}' not found. Creating new category...`
-        );
-        category = await db("categories")
-          .insert({
-            category_name,
-            status: "1",
-          })
+        console.log(`Creating new category: ${category_name}`);
+        const categoryInsert = await db("categories")
+          .insert({ category_name, status: "1" })
           .returning("*");
+        category = categoryInsert[0];
       }
 
       if (!vendor_name) {
@@ -391,37 +398,34 @@ const importData = async (req, res) => {
       }
 
       const vendorNames = vendor_name.split(",").map((vendor) => vendor.trim());
-
       let vendorIds = [];
+
       for (const vendorName of vendorNames) {
         let vendor = await db("vendors")
           .where({ vendor_name: vendorName })
           .first();
 
         if (!vendor) {
-          console.log(
-            `Vendor '${vendorName}' not found. Creating new vendor...`
-          );
-          vendor = await db("vendors")
-            .insert({
-              vendor_name: vendorName,
-              status: "1",
-            })
+          console.log(`Creating new vendor: ${vendorName}`);
+          const vendorInsert = await db("vendors")
+            .insert({ vendor_name: vendorName, status: "1" })
             .returning("*");
+          vendor = vendorInsert[0];
         }
 
+        console.log(
+          `Vendor found/created: ${vendor.vendor_id} - ${vendor.vendor_name}`
+        );
         vendorIds.push(vendor.vendor_id);
       }
 
-      const existingProduct = await db("products")
+      let existingProduct = await db("products")
         .where({ product_name })
         .first();
 
       if (existingProduct) {
         if (status === 0) {
-          await db("products").where({ product_name }).update({
-            status: "1",
-          });
+          await db("products").where({ product_name }).update({ status: "1" });
         }
 
         if (existingProduct.status !== "99") {
@@ -442,6 +446,9 @@ const importData = async (req, res) => {
             .first();
 
           if (!existingProductVendor) {
+            console.log(
+              `Mapping product (${existingProduct.product_id}) to vendor (${vendorId})`
+            );
             await db("product_to_vendor").insert({
               product_id: existingProduct.product_id,
               vendor_id: vendorId,
@@ -450,20 +457,31 @@ const importData = async (req, res) => {
           }
         }
       } else {
-        const newProduct = await db("products")
+        const newProductId = await db("products")
           .insert({
             product_name,
             category_id: category.category_id,
             quantity_in_stock: Number(quantity_in_stock),
-            status: status.toString() || "1",
+            status: status ? status.toString() : "1",
             unit_price,
             product_image,
           })
-          .returning("*");
+          .then((ids) => ids[0]);
+
+        const newProduct = await db("products")
+          .where({ product_id: newProductId })
+          .first();
+
+        console.log(
+          `New product added: ${newProduct.product_id} - ${product_name}`
+        );
 
         for (const vendorId of vendorIds) {
+          console.log(
+            `Mapping new product (${newProduct.product_id}) to vendor (${vendorId})`
+          );
           await db("product_to_vendor").insert({
-            product_id: newProduct[0].product_id,
+            product_id: newProduct.product_id,
             vendor_id: vendorId,
             status: "1",
           });
@@ -479,10 +497,10 @@ const importData = async (req, res) => {
 };
 
 module.exports = {
-  postproduct,
+  postProduct,
   deleteProduct,
   getAllProducts,
-  updateimage,
+  updateImage,
   moveToCart,
   getCartData,
   importData,

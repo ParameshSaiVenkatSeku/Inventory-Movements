@@ -9,8 +9,6 @@ import { ProductFormComponent } from './components/product-form/product-form.com
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { FilterPipe } from './pipes/filter.pipe';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { HttpInterceptorInterceptor } from '../auth/interceptors/http-interceptor.interceptor';
 import { CartComponent } from './components/cart/cart.component';
 
 @NgModule({
