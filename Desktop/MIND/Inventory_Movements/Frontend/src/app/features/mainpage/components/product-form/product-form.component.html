@@ -1,4 +1,4 @@
-<div class="modal-body">
+<div class="modal-body custom-font">
   <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
     <!-- Product Name -->
     <div class="mb-3">
@@ -25,7 +25,9 @@
     <div class="mb-3">
       <label for="category" class="form-label">Category</label>
       <select id="category" class="form-select" formControlName="category">
-        <option value="" disabled selected>Select category</option>
+        <option value="" disabled selected class="custom-font">
+          Select category
+        </option>
         <option
           *ngFor="let category of categories?.data"
           [value]="category.category_id"
@@ -45,9 +47,8 @@
     </div>
 
     <!-- Vendor -->
-
     <div class="mb-3">
-      <label for="vendor" class="form-label">Vendor</label>
+      <label for="vendor" class="form-label">Vendors</label>
       <div class="form-check" *ngFor="let vendor of vendors?.data">
         <input
           class="form-check-input"
@@ -67,13 +68,13 @@
         "
         class="text-danger"
       >
-        Vendor is required.
+        Atleast one Vendor is required.
       </div>
     </div>
 
     <!-- Quantity -->
     <div class="mb-3">
-      <label for="quantity" class="form-label">Quantity in stock</label>
+      <label for="quantity" class="form-label">Quantity</label>
       <input
         type="number"
         id="quantity"
@@ -94,7 +95,7 @@
 
     <!-- Unit -->
     <div class="mb-3">
-      <label for="unit" class="form-label">Unit</label>
+      <label for="unit" class="form-label">Unit Price</label>
       <input
         type="text"
         id="unit"
@@ -116,8 +117,11 @@
     <div class="mb-3">
       <label for="status" class="form-label">Status</label>
       <select id="status" class="form-select" formControlName="status">
-        <option value="" disabled selected>Select status</option>
+        <option value="" disabled selected class="custom-font">
+          Select status
+        </option>
         <option value="1">Available</option>
+        <option value="0">Sold Out</option>
       </select>
       <div
         *ngIf="
@@ -132,9 +136,9 @@
 
     <!-- Upload Image -->
     <div class="mb-3">
-      <label for="productImage" class="form-label">Upload product image</label>
+      <label for="productImage" class="form-label">Upload Product Image</label>
       <label
-        class="align-items-center border rounded-3 p-4 mb-3 d-block cursor-pointer"
+        class="align-items-center border rounded-3 p-4 mb-3 d-block upload-container"
         *ngIf="!selectedFile"
       >
         <input
@@ -145,7 +149,7 @@
           (change)="onImageSelected($event)"
           accept=".svg, .png, .jpg, .jpeg, .webp"
         />
-        <i class="bi bi-cloud-arrow-up fs-1 text-secondary mb-2"></i>
+        <i class="bi bi-upload"></i>
         <p class="mb-1">Click to upload or drag and drop</p>
         <p class="text-muted small mb-0">
           SVG, PNG, JPG or GIF (max. 800x400px)
@@ -163,14 +167,13 @@
     </div>
 
     <!-- Buttons -->
-    <div class="d-flex justify-content-end">
-      <button type="button" class="btn btn-primary px-4" (click)="onUpload()">
-        Upload &nbsp;&nbsp;
+    <div class="d-flex justify-content-between">
+      <button type="button" class="btn red-button" (click)="onUpload()">
+        Upload
       </button>
-      <br />
       <button
         type="submit"
-        class="btn btn-primary"
+        class="btn red-button"
         [disabled]="productForm.invalid"
         data-bs-dismiss="modal"
       >

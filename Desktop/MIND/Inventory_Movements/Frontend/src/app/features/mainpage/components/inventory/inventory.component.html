@@ -7,24 +7,23 @@
       </div>
       <div *ngIf="!showCart">
         <button
-          class="on-hover btn btn-info border border-secondary me-2"
+          class="teal-button btn border me-2"
           (click)="move()"
           data-bs-toggle="modal"
           data-bs-target="#moveToCartModal"
         >
+          <i class="bi bi-cart-check"></i>
           Move to cart
         </button>
-        <button
-          class="on-hover btn btn-info me-2 border border-secondary"
-          (click)="download()"
-        >
+        <button class="teal-button btn border me-2" (click)="download()">
+          <i class="bi bi-cloud-download"></i>
           Download All
         </button>
         <button
-          class="on-hover btn btn-info me-2 border border-secondary"
+          class="teal-button btn border me-2"
           (click)="triggerFileInput()"
         >
-          <i class="bi bi-upload"></i> Import
+          <i class="bi bi-file-earmark-arrow-up"></i> Import
         </button>
         <input
           type="file"
@@ -35,7 +34,7 @@
         />
 
         <button
-          class="btn btn-primary violet-button"
+          class="btn purple-button border me-2"
           data-bs-toggle="modal"
           data-bs-target="#addProductModal"
         >
@@ -47,17 +46,19 @@
       <div class="d-flex justify-content-between align-items-center">
         <div class="btn-group">
           <button
-            class="on-hover btn btn-light-black active border border-secondary"
+            class="btn grey-button active border border-secondary"
             (click)="onView()"
             [class.active]="!showCart"
           >
+            <i class="bi bi-view-list"></i>
             View all
           </button>
           <button
-            class="on-hover btn btn-light-black border border-secondary"
+            class="btn grey-button active border border-secondary"
             (click)="onCart()"
             [class.active]="showCart"
           >
+            <i class="bi bi-cart"></i>
             Cart
           </button>
         </div>
@@ -136,7 +137,7 @@
             <th>Category <i class="bi bi-info-circle ms-1"></i></th>
             <th>Vendors</th>
             <th>Quantity</th>
-            <th>Unit</th>
+            <th>Unit Price</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -274,7 +275,7 @@
   aria-labelledby="moveToCartModalLabel"
   aria-hidden="true"
 >
-  <div class="modal-dialog modal-dialog-centered modal-lg">
+  <div class="modal-dialog modal-dialog-centeteal modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="moveToCartModalLabel">Move to Cart</h5>
@@ -299,7 +300,7 @@
   aria-labelledby="addProductModalLabel"
   aria-hidden="true"
 >
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centeteal">
     <div class="modal-content">
       <div class="modal-header">
         <h5
@@ -332,7 +333,7 @@
   aria-labelledby="addProductModalLabel"
   aria-hidden="true"
 >
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centeteal">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
@@ -359,7 +360,7 @@
   aria-labelledby="deleteModalLabel"
   aria-hidden="true"
 >
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centeteal">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="deleteModalLabel">Delete Product</h5>

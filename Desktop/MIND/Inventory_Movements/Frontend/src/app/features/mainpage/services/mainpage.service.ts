@@ -86,7 +86,7 @@ export class MainpageService {
   }
 
   editproduct(edit: any) {
-    console.log(edit);
+    // console.log(edit);
     return this.http.post(`${environment.Url}/dashboard/product`, edit);
   }
 
@@ -137,7 +137,7 @@ export class MainpageService {
       .subscribe(
         (data) => {
           this.toastr.success('Product Added Successfully', 'Success');
-          console.log('New product added:', data);
+          // console.log('New product added:', data);
         },
         (error) => {
           console.error('Error adding product:', error);

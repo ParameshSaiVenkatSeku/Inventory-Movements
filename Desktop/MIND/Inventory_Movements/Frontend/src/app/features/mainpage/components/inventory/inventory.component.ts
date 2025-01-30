@@ -79,11 +79,11 @@ export class InventoryComponent implements OnInit {
         })
         .subscribe(
           (response) => {
-            console.log('Data successfully uploaded to the backend:', response);
+            // console.log('Data successfully uploaded to the backend:', response);
             this.toastr.success('Data successfully uploaded', 'Success');
           },
           (error) => {
-            console.error('Error uploading Excel data to the backend:', error);
+            // console.error('Error uploading Excel data to the backend:', error);
             this.toastr.error('Error uploading excel data', 'Error');
           }
         );
@@ -92,7 +92,7 @@ export class InventoryComponent implements OnInit {
 
   validateColumns(columns: string[]): boolean {
     const normalizedColumns = columns.map((col) => col.trim());
-    console.log(normalizedColumns);
+    // console.log(normalizedColumns);
     return this.validColumns.every((column) =>
       normalizedColumns.includes(column)
     );
@@ -107,14 +107,14 @@ export class InventoryComponent implements OnInit {
   }
 
   removeFromCart(item: any) {
-    console.log(item);
+    // console.log(item);
     this.http
       .delete(`${environment.Url}/dashboard/deleteItem/${item.product_id}`, {
         body: { vendorName: item.vendor_name }, // Add vendor name in the body
       })
       .subscribe({
         next: (response) => {
-          console.log('Item deleted:', response);
+          // console.log('Item deleted:', response);
           this.toastr.success('Item deleted successfully', 'Success');
           this.fetchData();
           this.getCartData();
@@ -169,7 +169,7 @@ export class InventoryComponent implements OnInit {
 
   ngOnInit(): void {
     this.subject.pipe(debounceTime(300)).subscribe((data) => {
-      console.log(data);
+      // console.log(data);
     });
 
     this.getCartData();
@@ -234,7 +234,7 @@ export class InventoryComponent implements OnInit {
       (key) => this.selectedFilters[key]
     );
 
-    console.log(store);
+    // console.log(store);
     this.main
       .filterProduct(
         this.filterData,
@@ -245,7 +245,7 @@ export class InventoryComponent implements OnInit {
       )
       .subscribe({
         next: (res: any) => {
-          console.log(res);
+          // console.log(res);
           this.productData = res.data;
           this.totalPage = res.pagination.totalPage;
           this.totalcount = res.pagination.totalCount;
@@ -276,7 +276,7 @@ export class InventoryComponent implements OnInit {
         .delete(`${environment.Url}/dashboard/product/${this.productToDelete}`)
         .subscribe(
           (response) => {
-            console.log('Product soft deleted successfully');
+            // console.log('Product soft deleted successfully');
             this.productToDelete = null;
             this.fetchData();
           },
@@ -308,7 +308,7 @@ export class InventoryComponent implements OnInit {
       .post(`${environment.Url}/dashboard/upload/excel`, { data })
       .subscribe(
         (response) => {
-          console.log('Data uploaded successfully:', response);
+          // console.log('Data uploaded successfully:', response);
         },
         (error) => {
           console.error('Error uploading data:', error);
@@ -321,24 +321,24 @@ export class InventoryComponent implements OnInit {
     doc.setFontSize(16);
     doc.text('Product Details', 20, 20);
     doc.setFontSize(12);
-    console.log(product);
+    // console.log(product);
     doc.text(`Product Name: ${product.product_name}`, 20, 30);
-    console.log(product.product_name);
+    // console.log(product.product_name);
     doc.text(`Category: ${product.category_name}`, 20, 40);
-    console.log(product.category_name);
+    // console.log(product.category_name);
     doc.text(
       `Status: ${product.status === '1' ? 'Available' : 'Sold Out'}`,
       20,
       50
     );
     doc.text(`Quantity: ${product.quantity_in_stock}`, 20, 60);
-    console.log(product.quantity_in_stock);
+    // console.log(product.quantity_in_stock);
     doc.text(`Unit: ${product.unit_price}`, 20, 70);
-    console.log(product.unit_price);
+    // console.log(product.unit_price);
     doc.text(`Vendors: ${product.vendor_name}`, 20, 80);
-    console.log(product.vendor_name);
+    // console.log(product.vendor_name);
     doc.text(`Image Url: ${product.product_image}`, 20, 90);
-    console.log(product.product_image);
+    // console.log(product.product_image);
     doc.save(`${product.product_name}_details.pdf`);
   }
 
@@ -349,10 +349,10 @@ export class InventoryComponent implements OnInit {
       .post(`${environment.Url}/dashboard/product`, productData)
       .subscribe(
         (data) => {
-          console.log('New product added:', data);
+          // console.log('New product added:', data);
         },
         (error) => {
-          console.error('Error adding product:', error);
+          // console.error('Error adding product:', error);
         }
       );
     if (productData.status === 'Available') productData.status = 1;
@@ -445,7 +445,6 @@ export class InventoryComponent implements OnInit {
 
   adddata() {
     if (this.data) {
-      console.log('Uploading data...');
       for (let items of this.data) {
         this.main.addproducts(items);
       }

@@ -31,7 +31,7 @@ export class SignupComponent implements OnInit {
       const { firstName, lastName, email, password } = this.signupForm.value;
       this.authService.signup(firstName, lastName, email, password).subscribe({
         next: (response) => {
-          console.log('Signup successful', response);
+          // console.log('Signup successful', response);
           this.toastr.success('Sign up successful. Proceed with login.');
           this.router.navigate(['/auth/login']);
         },
@@ -41,7 +41,7 @@ export class SignupComponent implements OnInit {
         },
       });
     } else {
-      console.log('Form Invalid');
+      // console.log('Form Invalid');
     }
   }
 }

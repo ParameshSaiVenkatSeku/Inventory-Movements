@@ -139,14 +139,14 @@ export class FileUploadComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       this.selectedFile = input.files[0];
-      console.log(this.selectedFile);
+      // console.log(this.selectedFile);
     }
   }
 
   previewFile(file: File) {
     const reader = new FileReader();
     reader.onload = () => {
-      console.log(this.filePreviewUrl);
+      // console.log(this.filePreviewUrl);
       this.filePreviewUrl = reader.result;
     };
     reader.readAsDataURL(file);
@@ -157,28 +157,28 @@ export class FileUploadComponent implements OnInit {
     url: string;
     fileType: string;
   }) {
-    console.log('File clicked:', file);
+    // console.log('File clicked:', file);
 
     if (file.fileType.startsWith('image')) {
       this.filePreviewUrl = this.sanitizer.bypassSecurityTrustUrl(file.url);
       this.fileType = 'image';
-      console.log('Image file URL:', this.filePreviewUrl);
+      // console.log('Image file URL:', this.filePreviewUrl);
     } else if (file.fileType === 'pdf') {
       this.filePreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
         file.url
       );
       this.fileType = 'pdf';
-      console.log('PDF file URL:', this.filePreviewUrl);
+      // console.log('PDF file URL:', this.filePreviewUrl);
     } else if (file.fileType === 'xlsx') {
       this.filePreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
         file.url
       );
       this.fileType = 'xlsx';
-      console.log('Excel file URL:', this.filePreviewUrl);
+      // console.log('Excel file URL:', this.filePreviewUrl);
       this.fetchExcelFile(file.url);
     } else {
       this.filePreviewUrl = null;
-      console.log('Cannot preview this file type');
+      // console.log('Cannot preview this file type');
     }
   }
 

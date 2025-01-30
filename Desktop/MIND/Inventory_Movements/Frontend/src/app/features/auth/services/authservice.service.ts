@@ -13,10 +13,9 @@ export class AuthserviceService {
   private apiUrl = environment.Url;
   authSer: any;
 
-  constructor(
-    private http: HttpClient,
-    private encryptionService: EncryptionService // Inject EncryptionService
-  ) {}
+  constructor(private http: HttpClient) {}
+
+  secret_key: string = 'akriviaautomation';
 
   signup(
     firstName: string,
@@ -26,11 +25,11 @@ export class AuthserviceService {
   ): Observable<any> {
     const encryptedEmail = CryptoJS.AES.encrypt(
       email,
-      'akriviaautomation'
+      this.secret_key
     ).toString();
     const encryptedPassword = CryptoJS.AES.encrypt(
       password,
-      'akriviaautomation'
+      this.secret_key
     ).toString();
 
     const body = {
@@ -49,11 +48,11 @@ export class AuthserviceService {
     const data = { email, password };
     const encryptedEmail = CryptoJS.AES.encrypt(
       email,
-      'akriviaautomation'
+      this.secret_key
     ).toString();
     const encryptedPassword = CryptoJS.AES.encrypt(
       password,
-      'akriviaautomation'
+      this.secret_key
     ).toString();
 
     const body = {
@@ -109,9 +108,7 @@ export class AuthserviceService {
       );
   }
 
-  logout(): void {
-    // localStorage.removeItem('access_token');
-  }
+  logout(): void {}
 
   isAuth(): boolean {
     return this.isBrowser() && !!this.getToken();

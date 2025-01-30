@@ -9,7 +9,7 @@ Model.knex(db);
 const getUser = async (req, res) => {
   try {
     const userId = req.user.id;
-    console.log(userId);
+    // console.log(userId);
 
     const user = await db("users").where({ user_id: userId }).first();
     if (!user) {

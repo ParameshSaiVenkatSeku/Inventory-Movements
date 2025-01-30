@@ -2,8 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const dotenv = require("dotenv");
-const authRouter = require("./v1/auth/auth.routes");
-const userRouter = require("./v1/users/user.routes");
+const authRoutes = require("./v1/auth/auth.routes");
+const userRoutes = require("./v1/users/user.routes");
 const awsRoutes = require("./AWS/aws.routes");
 const dashboardRoutes = require("./v1/dashboard/dashboard.routes");
 const globalErrorHandler = require("./utils/errorController");
@@ -35,8 +35,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/auth", encryptionMiddleware, authRouter);
-app.use("/user", userRouter);
+app.use("/auth", encryptionMiddleware, authRoutes);
+app.use("/user", userRoutes);
 app.use("/api", awsRoutes);
 app.use("/dashboard", dashboardRoutes);
 

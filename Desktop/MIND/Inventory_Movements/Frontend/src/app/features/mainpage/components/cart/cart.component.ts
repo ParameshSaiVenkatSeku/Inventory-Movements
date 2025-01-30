@@ -40,7 +40,7 @@ export class CartComponent implements OnInit {
 
       this.totalCount = data.length;
       this.totalPages = Math.ceil(this.totalCount / 10);
-      console.log('Cart data:', this.cartData);
+      // console.log('Cart data:', this.cartData);
     });
   }
 
@@ -79,11 +79,11 @@ export class CartComponent implements OnInit {
   }
 
   async moveToCart() {
-    console.log(this.cartData);
+    // console.log(this.cartData);
     const token = sessionStorage.getItem('access_token');
     if (token) {
       this.userId = JSON.parse(atob(token.split('.')[1]));
-      console.log(this.userId, token);
+      // console.log(this.userId, token);
     } else {
       console.error('No access token found');
       return;
@@ -101,7 +101,7 @@ export class CartComponent implements OnInit {
           .post(`${environment.Url}/dashboard/move-to-cart`, payload)
           .subscribe(
             (response: any) => {
-              console.log('Product moved to cart:', response);
+              // console.log('Product moved to cart:', response);
 
               this.alertMessage = 'Item added to cart';
               this.showAlert = true;

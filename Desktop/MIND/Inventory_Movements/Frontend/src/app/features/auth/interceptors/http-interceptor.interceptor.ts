@@ -48,13 +48,13 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(clonedRequest).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
-          console.log('came inside 1');
+          // console.log('came inside 1');
           if (!this.refreshingToken) {
             this.refreshingToken = true;
-            console.log('came inside 2');
+            // console.log('came inside 2');
             this.refreshTokenSubject = this.authService.refreshToken().pipe(
               switchMap((newToken: any) => {
-                console.log('came inside 3');
+                // console.log('came inside 3');
                 this.authService.setToken(newToken.access_token);
                 this.authService.setRefreshToken(newToken.refresh_token);
                 return of(newToken.access_token);
@@ -66,7 +66,7 @@ export class AuthInterceptor implements HttpInterceptor {
               filter((token) => token !== null),
               take(1),
               switchMap((newAccessToken: string) => {
-                console.log('new', newAccessToken);
+                // console.log('new', newAccessToken);
 
                 if (
                   !request.url.includes('/api') &&
@@ -78,8 +78,11 @@ export class AuthInterceptor implements HttpInterceptor {
                     },
                   });
                 }
-                //this.toastr.success("New Access token generated SuccessFully","Success");
-                console.log('New Access token generated SuccessFully');
+                this.toastr.success(
+                  'New Access token generated SuccessFully',
+                  'Success'
+                );
+                // console.log('New Access token generated SuccessFully');
                 return next.handle(request);
               })
             ) || throwError(() => new Error('Token refresh failed'))

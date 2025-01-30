@@ -43,3 +43,13 @@
   border-radius: 8px;
   z-index: 1030;
 }
+
+.violet-button {
+  background-color: rgb(128, 0, 128);
+  color: white;
+  border: none;
+}
+
+.violet-button:hover {
+  background-color: rgb(0, 110, 110);
+}

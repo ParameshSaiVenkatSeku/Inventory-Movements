@@ -14,7 +14,6 @@ const postProduct = async (req, res) => {
     productImage,
   } = req.body;
 
-  // console.log(req.body);
   try {
     if (productId) {
       await db("products").where({ product_id: productId }).update({
@@ -24,14 +23,7 @@ const postProduct = async (req, res) => {
         unit_price: unit,
         status: status,
       });
-
-      // console.log("Product updated successfully");
-
-      // Remove existing vendor associations for the product
       await db("product_to_vendor").where({ product_id: productId }).del();
-      // console.log("Old vendor associations removed successfully.");
-
-      // Insert new vendor associations
       const vendorData = vendor.map((v) => ({
         vendor_id: v,
         product_id: productId,
@@ -39,9 +31,7 @@ const postProduct = async (req, res) => {
       }));
 
       await db("product_to_vendor").insert(vendorData);
-      // console.log("Vendor associations updated successfully.");
     } else {
-      // Insert new product
       const [newProductId] = await db("products").insert(
         {
           product_name: productName,
@@ -53,9 +43,6 @@ const postProduct = async (req, res) => {
         },
         ["product_id"]
       );
-      // console.log("Inserted product ID:", newProductId);
-
-      // Insert vendor associations for the new product
       const vendorData = vendor.map((v) => ({
         vendor_id: v,
         product_id: newProductId,
@@ -63,10 +50,8 @@ const postProduct = async (req, res) => {
       }));
 
       await db("product_to_vendor").insert(vendorData);
-      // console.log("Vendor associations added successfully.");
     }
 
-    // Fetch all products with their details and vendors
     const products = await db("products as p")
       .select(
         "p.product_id",
@@ -98,12 +83,10 @@ const deleteProduct = async (req, res) => {
     await db("products")
       .where("product_id", productId)
       .update({ status: "99" });
-    // console.log("Product soft deleted successfully with ID:", productId);
 
     await db("product_to_vendor")
       .where("product_id", productId)
       .update({ status: "99" });
-    // console.log("Soft Deleted vendor associations for product ID:", productId);
     res.send({
       message: "Product soft deleted successfully",
     });
@@ -182,7 +165,6 @@ const getAllProducts = async (req, res, next) => {
     productsData.orderBy("c.category_name", "asc");
 
     const products = await productsData;
-    // console.log(products);
     for (const product of products) {
       if (product.quantity_in_stock === 0 && product.status !== "0") {
         await db("products")
@@ -227,7 +209,6 @@ const getAllProducts = async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.log(error, "while featching the data");
     return res.status(500).json({
       message: "interval server error",
     });
@@ -236,7 +217,6 @@ const getAllProducts = async (req, res, next) => {
 
 const updateImage = async (req, res) => {
   const { id, image } = req.body;
-  // console.log("dsjbdn", image, id);
   try {
     await db("products")
       .where({ product_id: id })
@@ -249,9 +229,7 @@ const updateImage = async (req, res) => {
 };
 
 const moveToCart = async (req, res) => {
-  // console.log("Move to Cart route hit");
   const { productId, quantity, vendorName, userId } = req.body;
-  // console.log(req.body);
 
   const trx = await db.transaction();
   try {
@@ -286,7 +264,6 @@ const moveToCart = async (req, res) => {
         .update({
           quantity: existingCartItem.quantity + quantity,
         });
-      console.log("Updated quantity in cart");
     } else {
       await trx("product_cards").insert({
         product_id: productId,
@@ -297,10 +274,7 @@ const moveToCart = async (req, res) => {
         user_id: userId.user_id,
         status: 1,
       });
-      console.log("Added product to cart");
     }
-    console.log(product);
-
     await trx("products")
       .where("product_id", productId)
       .update({
@@ -317,7 +291,6 @@ const moveToCart = async (req, res) => {
 };
 
 const getCartData = async (req, res) => {
-  console.log("dj");
   try {
     const cartItems = await db("product_cards").select(
       "product_id",
@@ -326,7 +299,6 @@ const getCartData = async (req, res) => {
       "vendor_name"
     );
 
-    console.log(cartItems);
     res.status(200).send({ data: cartItems });
   } catch (error) {
     console.error("Error fetching cart data:", error);
@@ -365,10 +337,6 @@ const deleteCartData = async (req, res) => {
       .where("product_id", itemId)
       .increment("quantity_in_stock", itemQuantity);
 
-    console.log(
-      `Deleted ${deletedCount} item(s) with ID: ${itemId} and restored quantity: ${itemQuantity}`
-    );
-
     res
       .status(200)
       .send({ message: "Item deleted successfully and quantity restored" });
@@ -380,7 +348,6 @@ const deleteCartData = async (req, res) => {
 
 const importData = async (req, res) => {
   const { csvData } = req.body;
-  console.log(csvData);
 
   if (!csvData || csvData.length === 0) {
     return res.status(400).json({ message: "No Excel data provided." });
@@ -406,7 +373,6 @@ const importData = async (req, res) => {
 
       let category = await db("categories").where({ category_name }).first();
       if (!category) {
-        console.log(`Creating new category: ${category_name}`);
         const categoryInsert = await db("categories")
           .insert({ category_name, status: "1" })
           .returning("*");
@@ -428,16 +394,11 @@ const importData = async (req, res) => {
           .first();
 
         if (!vendor) {
-          console.log(`Creating new vendor: ${vendorName}`);
           const vendorInsert = await db("vendors")
             .insert({ vendor_name: vendorName, status: "1" })
             .returning("*");
           vendor = vendorInsert[0];
         }
-
-        console.log(
-          `Vendor found/created: ${vendor.vendor_id} - ${vendor.vendor_name}`
-        );
         vendorIds.push(vendor.vendor_id);
       }
 
@@ -468,9 +429,6 @@ const importData = async (req, res) => {
             .first();
 
           if (!existingProductVendor) {
-            console.log(
-              `Mapping product (${existingProduct.product_id}) to vendor (${vendorId})`
-            );
             await db("product_to_vendor").insert({
               product_id: existingProduct.product_id,
               vendor_id: vendorId,
@@ -494,14 +452,7 @@ const importData = async (req, res) => {
           .where({ product_id: newProductId })
           .first();
 
-        console.log(
-          `New product added: ${newProduct.product_id} - ${product_name}`
-        );
-
         for (const vendorId of vendorIds) {
-          console.log(
-            `Mapping new product (${newProduct.product_id}) to vendor (${vendorId})`
-          );
           await db("product_to_vendor").insert({
             product_id: newProduct.product_id,
             vendor_id: vendorId,
