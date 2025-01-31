@@ -17,6 +17,8 @@ const s3 = new AWS.S3();
 
 const getUrl = async (req, res) => {
   let { fileName, fileType, userId, folderName } = req.body;
+  console.log("aws 20", fileType);
+
   try {
     if (!fileName || !fileType) {
       return res.status(400).json({ message: "Missing fileName or fileType" });
@@ -24,7 +26,13 @@ const getUrl = async (req, res) => {
     if (userId === "-1") {
       folderName = "fileuploads";
     } else {
-      folderName = "profile-photos";
+      if (
+        fileType === "application/vnd.ms-excel" ||
+        fileType ===
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      )
+        folderName = `imported-files/${userId}`;
+      else folderName = "profile-photos";
     }
     const s3Params = {
       Bucket: process.env.AWS_BUCKET_NAME,

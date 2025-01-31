@@ -1,6 +1,6 @@
 /* Teal Button */
 .teal-button {
-  background-color: #008080;
+  background-color: #009688;
   color: white;
   padding: 10px 20px;
   border: none;
@@ -17,7 +17,7 @@
 
 /* Grey Button */
 .grey-button {
-  background-color: #9e9e9e;
+  background-color: #bdbdbd;
   color: white;
   padding: 10px 20px;
   border: none;
@@ -138,4 +138,19 @@
       }
     }
   }
+}
+
+.upload-area {
+  text-align: center;
+  cursor: pointer;
+  border: 2px dashed #ccc;
+  padding: 20px;
+  transition: all 0.3s ease-in-out;
+  &:hover {
+    background-color: #f8f9fa;
+  }
+}
+
+.spinner-border {
+  margin-top: 10px;
 }

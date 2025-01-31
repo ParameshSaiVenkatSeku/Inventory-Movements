@@ -42,6 +42,8 @@ app.use("/dashboard", dashboardRoutes);
 
 app.use(globalErrorHandler);
 
+app.use(express.urlencoded({ extended: true }));
+
 app.listen(3000, () => {
   logger.info(`Server running on http://localhost:${PORT}`);
 });

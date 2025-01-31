@@ -21,17 +21,11 @@
         </button>
         <button
           class="teal-button btn border me-2"
-          (click)="triggerFileInput()"
+          data-bs-toggle="modal"
+          data-bs-target="#importModal"
         >
           <i class="bi bi-file-earmark-arrow-up"></i> Import
         </button>
-        <input
-          type="file"
-          #fileInput
-          (change)="handleFileInput($event)"
-          accept=".xls,.xlsx"
-          style="display: none"
-        />
 
         <button
           class="btn purple-button border me-2"
@@ -346,6 +340,108 @@
       </div>
       <div class="modal-body">
         <app-product-form (formSubmitted)="editform($event)"></app-product-form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="importModal"
+  tabindex="-1"
+  aria-labelledby="uploadModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <div>
+          <h5 class="modal-title fw-semibold mb-1" id="uploadModalLabel">
+            Upload and Attach Files
+          </h5>
+          <p class="text-muted mb-0 small">Please upload your file</p>
+        </div>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <div class="modal-body text-center py-4">
+        <!-- File Upload Box -->
+        <label
+          class="upload-area border rounded-3 p-4 mb-3 d-block cursor-pointer"
+          *ngIf="!selectedFile"
+        >
+          <input
+            type="file"
+            class="d-none"
+            (change)="handleFileInput($event)"
+            accept=".xls,.xlsx"
+            #fileInput
+          />
+          <i class="bi bi-upload fs-1 text-secondary mb-2"></i>
+          <p class="mb-1">Click to upload or drag and drop</p>
+          <p class="text-secondary small mb-0">Only Excel files are allowed</p>
+        </label>
+
+        <!-- Show Selected File -->
+        <div *ngIf="selectedFile">
+          <p><strong>File Name:</strong> {{ selectedFile.name }}</p>
+          <p>
+            <strong>File Size:</strong> {{ selectedFile.size | number }} bytes
+          </p>
+
+          <!-- Upload Progress Indicator -->
+          <div *ngIf="uploadInProgress">
+            <div class="progress">
+              <div
+                class="progress-bar"
+                role="progressbar"
+                [style.width.%]="progressValue"
+                [attr.aria-valuenow]="progressValue"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              >
+                {{ progressValue }}%
+              </div>
+            </div>
+            <p>Uploading file...</p>
+          </div>
+
+          <!-- Success Message -->
+          <div
+            *ngIf="!uploadInProgress && progressValue === 100"
+            class="text-success"
+            data-bs-dismiss="modal"
+          >
+            <i class="bi bi-check-circle-fill"></i> File uploaded successfully!
+          </div>
+
+          <!-- Upload & Cancel Buttons -->
+          <div
+            class="d-flex justify-content-end gap-2"
+            *ngIf="!uploadInProgress"
+          >
+            <button
+              type="button"
+              class="btn btn-light"
+              (click)="resetFileSelection()"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger px-4"
+              (click)="uploadFile()"
+              [disabled]="!selectedFile"
+            >
+              Import File
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

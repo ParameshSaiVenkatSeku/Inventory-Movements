@@ -41,6 +41,16 @@ export class InventoryComponent implements OnInit {
 
   subject = new Subject<any>();
   filter: boolean = true;
+  // uploading: boolean = false;
+  progressValue: number = 0;
+  uploadInProgress: boolean = false;
+
+  handleFileInput(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      this.selectedFile = file;
+    }
+  }
 
   triggerFileInput(): void {
     if (this.fileInput) {
@@ -50,24 +60,61 @@ export class InventoryComponent implements OnInit {
     }
   }
 
-  handleFileInput(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const data = new Uint8Array(e.target?.result as ArrayBuffer);
-        const workbook = xlsx.read(data, { type: 'array' });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const jsonData = xlsx.utils.sheet_to_json(sheet, { defval: '' }); // Convert to JSON
+  resetFileSelection(): void {
+    this.selectedFile = null;
+  }
 
-        if (this.validateColumns(Object.keys(jsonData[0] as object))) {
-          this.uploadExcelData(jsonData);
-        } else {
-          this.toastr.error('Invalid Excel format', 'Error');
-        }
-      };
-      reader.readAsArrayBuffer(file);
+  async uploadFile(): Promise<void> {
+    if (!this.selectedFile) {
+      this.toastr.error('Please select a file to upload.', 'Error');
+      return;
+    }
+
+    this.uploadInProgress = true;
+    this.progressValue = 0;
+
+    try {
+      const fileName = this.selectedFile.name;
+      const fileType = this.selectedFile.type;
+      let userId: number;
+      const token = sessionStorage.getItem('access_token');
+      if (token) {
+        const user = JSON.parse(atob(token.split('.')[1]));
+        userId = user.user_id;
+      } else {
+        console.error('No access token found');
+        return;
+      }
+      console.log(userId);
+      const presignedUrlResponse = await this.http
+        .post<any>(`${environment.Url}/api/get-presigned-url`, {
+          fileName,
+          fileType,
+          userId,
+        })
+        .toPromise();
+
+      if (!presignedUrlResponse || !presignedUrlResponse.presignedUrl) {
+        throw new Error('Failed to get presigned URL');
+      }
+
+      const presignedUrl = presignedUrlResponse.presignedUrl;
+      console.log(presignedUrl);
+
+      await this.http
+        .put(presignedUrl, this.selectedFile, {
+          reportProgress: true,
+          observe: 'events',
+        })
+        .toPromise();
+
+      this.toastr.success('File uploaded successfully!', 'Success');
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      this.toastr.error('File upload failed!', 'Error');
+    } finally {
+      this.uploadInProgress = false;
+      this.selectedFile = null;
     }
   }
 
