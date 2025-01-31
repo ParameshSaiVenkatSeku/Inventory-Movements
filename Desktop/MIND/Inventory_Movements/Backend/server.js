@@ -2,10 +2,13 @@ const express = require("express");
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const dotenv = require("dotenv");
+
 const authRoutes = require("./v1/auth/auth.routes");
 const userRoutes = require("./v1/users/user.routes");
 const awsRoutes = require("./AWS/aws.routes");
 const dashboardRoutes = require("./v1/dashboard/dashboard.routes");
+const importRoutes = require("./v1/import/import.routes");
+
 const globalErrorHandler = require("./utils/errorController");
 const logger = require("./middlewares/logger");
 const encryptionMiddleware = require("./middlewares/encryptionMiddleware");
@@ -39,6 +42,7 @@ app.use("/auth", encryptionMiddleware, authRoutes);
 app.use("/user", userRoutes);
 app.use("/api", awsRoutes);
 app.use("/dashboard", dashboardRoutes);
+app.use("/imports", importRoutes);
 
 app.use(globalErrorHandler);
 

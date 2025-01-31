@@ -72,7 +72,10 @@ export class MainpageService {
   }
 
   getFiles(): Observable<any[]> {
-    return this.http.get<any[]>(`${environment.Url}/api/getfiles`);
+    const negation_value = -1;
+    return this.http.get<any[]>(
+      `${environment.Url}/api/getfiles/${negation_value}`
+    );
   }
 
   downloadSelectedFiles(selectedFiles: string[]): Observable<Blob> {

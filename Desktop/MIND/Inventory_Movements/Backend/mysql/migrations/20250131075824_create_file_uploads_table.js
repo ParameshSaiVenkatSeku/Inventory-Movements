@@ -5,9 +5,9 @@ exports.up = function (knex) {
     table.string("file_name", 255).notNullable();
     table.string("file_path", 255).notNullable();
     table.enum("status", ["pending", "completed"]).defaultTo("pending");
-    table.integer("total_records").notNullable();
-    table.integer("success_records").notNullable();
-    table.integer("failed_records").notNullable();
+    table.integer("total_records");
+    table.integer("success_records");
+    table.integer("failed_records");
     table.string("error_file_url", 255);
     table.timestamp("created_at").defaultTo(knex.fn.now());
   });

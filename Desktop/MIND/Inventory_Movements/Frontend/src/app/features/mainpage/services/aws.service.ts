@@ -41,8 +41,8 @@ export class AwsService {
     });
   }
 
-  getFiles(UserId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${environment.Url}/api/getfiles/${UserId}`);
+  getFiles(): Observable<any[]> {
+    return this.http.get<any[]>(`${environment.Url}/api/getfiles`);
   }
 
   downloadSelectedFiles(selectedFiles: string[]): Observable<Blob> {

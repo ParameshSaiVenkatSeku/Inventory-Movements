@@ -15,6 +15,25 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 
+const getFileData = async (fileUrl) => {
+  // console.log("aws controller - 19", userId, fileName);
+  // console.log(fileUrl.split(".amazonaws.com/")[1]);
+
+  const params = {
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: fileUrl.split(".amazonaws.com/")[1],
+  };
+
+  try {
+    const data = await s3.getObject(params).promise();
+    // console.log("aws controller js - 27", data.Body);
+    return data.Body;
+  } catch (error) {
+    console.error(`Error fetching file from S3`, error);
+    throw error;
+  }
+};
+
 const getUrl = async (req, res) => {
   let { fileName, fileType, userId, folderName } = req.body;
   console.log("aws 20", fileType);
@@ -75,13 +94,17 @@ const profileUpdate = async (req, res) => {
 
 const getFiles = async (req, res) => {
   const id = req.params.id;
+
   let folderName = "";
+
   if (id == -1) folderName = "fileuploads";
   else folderName = `imported-files/${id}`;
+
   const params = {
     Bucket: process.env.AWS_BUCKET_NAME,
     Prefix: `AKV0779/${folderName}`,
   };
+
   s3.listObjectsV2(params, (err, data) => {
     if (err) {
       console.error("Error fetching files from S3:", err);
@@ -89,7 +112,7 @@ const getFiles = async (req, res) => {
     }
 
     const files = data.Contents.map((file) => {
-      const fileName = file.Key.replace(`AKV0779/${folderName}`, "");
+      const fileName = file.Key.replace(`AKV0779/${folderName}/`, "");
       return {
         fileName: fileName,
         fileSize: file.Size,
@@ -107,7 +130,7 @@ const downloadZip = (req, res) => {
   if (!selectedFiles || selectedFiles.length === 0) {
     return res.status(400).json({ message: "No files selected" });
   }
-  const folderPrefix = "AKV0779/profile-photos/";
+  const folderPrefix = "AKV0779/fileuploads/";
   const archive = archiver("zip", {
     zlib: { level: 9 },
   });
@@ -135,4 +158,4 @@ const downloadZip = (req, res) => {
   archive.finalize();
 };
 
-module.exports = { getUrl, profileUpdate, getFiles, downloadZip };
+module.exports = { getFileData, getUrl, profileUpdate, getFiles, downloadZip };

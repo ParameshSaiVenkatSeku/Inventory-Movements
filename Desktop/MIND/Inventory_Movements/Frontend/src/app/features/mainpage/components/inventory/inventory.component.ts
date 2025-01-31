@@ -88,7 +88,7 @@ export class InventoryComponent implements OnInit {
         console.error('No access token found');
         return;
       }
-      console.log(userId);
+      // console.log(userId);
       const presignedUrlResponse = await this.http
         .post<any>(`${environment.Url}/api/get-presigned-url`, {
           fileName,
@@ -110,6 +110,15 @@ export class InventoryComponent implements OnInit {
           observe: 'events',
         })
         .toPromise();
+
+      this.http
+        .post(`${environment.Url}/imports/upload-file/`, {
+          fileName: this.selectedFile.name,
+          userId: userId,
+        })
+        .subscribe(() => {
+          console.log('hello');
+        });
 
       this.toastr.success('File uploaded successfully!', 'Success');
     } catch (error) {
