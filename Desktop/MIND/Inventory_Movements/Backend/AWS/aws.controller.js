@@ -74,18 +74,22 @@ const profileUpdate = async (req, res) => {
 };
 
 const getFiles = async (req, res) => {
+  const id = req.params.id;
+  let folderName = "";
+  if (id == -1) folderName = "fileuploads";
+  else folderName = `imported-files/${id}`;
   const params = {
     Bucket: process.env.AWS_BUCKET_NAME,
-    Prefix: "AKV0779/fileuploads/",
+    Prefix: `AKV0779/${folderName}`,
   };
-
   s3.listObjectsV2(params, (err, data) => {
     if (err) {
       console.error("Error fetching files from S3:", err);
       return res.status(500).json({ message: "Error fetching files from S3" });
     }
+
     const files = data.Contents.map((file) => {
-      const fileName = file.Key.replace("AKV0779/fileuploads/", "");
+      const fileName = file.Key.replace(`AKV0779/${folderName}`, "");
       return {
         fileName: fileName,
         fileSize: file.Size,

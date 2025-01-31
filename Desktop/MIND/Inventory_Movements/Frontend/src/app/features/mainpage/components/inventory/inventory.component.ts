@@ -27,6 +27,9 @@ interface cartData {
   styleUrls: ['./inventory.component.css'],
 })
 export class InventoryComponent implements OnInit {
+  onImport() {
+    throw new Error('Method not implemented.');
+  }
   validColumns = [
     'product_name',
     'product_image',
