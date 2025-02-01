@@ -4,7 +4,9 @@ exports.up = function (knex) {
     table.integer("user_id").notNullable();
     table.string("file_name", 255).notNullable();
     table.string("file_path", 255).notNullable();
-    table.enum("status", ["pending", "completed"]).defaultTo("pending");
+    table
+      .enum("status", ["pending", "processing", "completed"])
+      .defaultTo("pending");
     table.integer("total_records");
     table.integer("success_records");
     table.integer("failed_records");
@@ -14,5 +16,5 @@ exports.up = function (knex) {
 };
 
 exports.down = function (knex) {
-  return knex.schema.dropTableIfExists("file_uploads"); // Rollback by dropping the table
+  return knex.schema.dropTableIfExists("file_uploads");
 };

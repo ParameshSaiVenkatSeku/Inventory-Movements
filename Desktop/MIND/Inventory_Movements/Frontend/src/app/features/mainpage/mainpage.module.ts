@@ -10,6 +10,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { FilterPipe } from './pipes/filter.pipe';
 import { CartComponent } from './components/cart/cart.component';
+import { ImportFileComponent } from './components/import-file/import-file.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { CartComponent } from './components/cart/cart.component';
     ProductFormComponent,
     FilterPipe,
     CartComponent,
+    ImportFileComponent,
   ],
   imports: [
     CommonModule,
