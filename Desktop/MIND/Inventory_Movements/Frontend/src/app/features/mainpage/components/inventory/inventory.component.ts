@@ -27,8 +27,10 @@ interface cartData {
   styleUrls: ['./inventory.component.css'],
 })
 export class InventoryComponent implements OnInit {
+  showUploads?: boolean;
   onImport() {
-    throw new Error('Method not implemented.');
+    this.showCart = false;
+    this.showUploads = true;
   }
   validColumns = [
     'product_name',
@@ -262,11 +264,13 @@ export class InventoryComponent implements OnInit {
   onCart() {
     this.showCart = true;
     this.filter = false;
+    this.showUploads = false;
   }
 
   onView() {
     this.showCart = false;
     this.filter = true;
+    this.showUploads = false;
   }
 
   move() {

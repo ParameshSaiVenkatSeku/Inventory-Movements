@@ -5,7 +5,7 @@
         <h5 class="mb-0">Inventory Movements</h5>
         <small class="text-muted">{{ totalcount }} Products</small>
       </div>
-      <div *ngIf="!showCart">
+      <div *ngIf="!showCart && !showUploads">
         <button
           class="teal-button btn border me-2"
           (click)="move()"
@@ -58,6 +58,7 @@
           <button
             class="btn grey-button active border border-secondary"
             (click)="onImport()"
+            [class.active]="showUploads"
           >
             <i class="bi bi-file-earmark-spreadsheet"></i>
             My Uploads
@@ -89,9 +90,8 @@
           </button>
 
           <div class="dropdown" *ngIf="isDropdownOpen">
-            <div class="dropdown-menu p-3" style="min-width: 250px">
+            <div class="dropdown-menu p-3">
               <h6 class="dropdown-header px-0 text-dark fw-bold">Columns</h6>
-
               <ul class="list-unstyled">
                 <li>
                   <label class="d-flex align-items-center">
@@ -127,9 +127,9 @@
       </div>
     </div>
   </div>
-  <div class="card-body" *ngIf="!showCart">
-    <div class="table-responsive">
-      <table class="table">
+  <div class="card-body" *ngIf="!showCart && !showUploads">
+    <div>
+      <table class="table table-responsive table-hover">
         <thead>
           <tr>
             <th>#</th>
@@ -238,9 +238,13 @@
   </div>
 </div>
 
+<div class="card-body" *ngIf="showUploads">
+  <app-import-file></app-import-file>
+</div>
+
 <div class="card-body" *ngIf="showCart">
-  <div class="table-responsive">
-    <table class="table">
+  <div>
+    <table class="table table-responsive table-hover">
       <thead>
         <tr>
           <th>Product Name</th>

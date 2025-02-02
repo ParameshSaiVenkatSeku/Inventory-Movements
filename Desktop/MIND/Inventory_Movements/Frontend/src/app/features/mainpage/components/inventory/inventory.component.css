@@ -55,6 +55,7 @@
   box-shadow: none;
 }
 
+/* Card Styling */
 .card {
   margin-top: 80px;
   border-radius: 20px;
@@ -66,6 +67,7 @@
   border-top-right-radius: 20px;
 }
 
+/* Button Variants */
 .btn-black {
   background-color: #000;
   color: #fff;
@@ -89,68 +91,88 @@
   border-color: #ccc;
 }
 
+/* Corrected Dropdown Styles */
 .dropdown {
   position: relative;
-
-  .btn {
-    background-color: #007bff;
-    color: #fff;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-
-    &:hover {
-      background-color: #0056b3;
-    }
-  }
-
-  .dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 1000;
-    display: block;
-    padding: 0.5rem;
-    min-width: 200px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-    li {
-      list-style: none;
-
-      label {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        cursor: pointer;
-
-        input[type="checkbox"] {
-          margin: 0;
-        }
-
-        &:hover {
-          background-color: #f8f9fa;
-          border-radius: 4px;
-        }
-      }
-    }
-  }
+  display: inline-block;
 }
 
+.dropdown .btn {
+  background-color: #007bff;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.dropdown .btn:hover {
+  background-color: #0056b3;
+}
+
+.dropdown .dropdown-menu {
+  position: absolute;
+  top: calc(100% + 5px); /* 5px gap below the button */
+  left: 0;
+  z-index: 1000;
+  display: block; /* Ensures it shows when toggled */
+  padding: 0.5rem;
+  min-width: 250px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown .dropdown-menu .dropdown-header {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333;
+  padding-bottom: 0.5rem;
+}
+
+.dropdown .dropdown-menu ul {
+  margin: 0;
+  padding: 0;
+}
+
+.dropdown .dropdown-menu ul li {
+  list-style: none;
+  padding: 0.25rem 0;
+}
+
+.dropdown .dropdown-menu ul li label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.dropdown .dropdown-menu ul li label:hover {
+  background-color: #f8f9fa;
+}
+
+.dropdown .dropdown-menu ul li label input[type="checkbox"] {
+  margin: 0;
+}
+
+/* Upload Area */
 .upload-area {
   text-align: center;
   cursor: pointer;
   border: 2px dashed #ccc;
   padding: 20px;
   transition: all 0.3s ease-in-out;
-  &:hover {
-    background-color: #f8f9fa;
-  }
 }
 
+.upload-area:hover {
+  background-color: #f8f9fa;
+}
+
+/* Spinner */
 .spinner-border {
   margin-top: 10px;
 }

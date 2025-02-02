@@ -1,5 +1,8 @@
 const { insertFileDetails, parseExcelData } = require("./import.service");
-const { getPendingFileNames } = require("./import.queries");
+const {
+  getPendingFileNames,
+  getFileUploadsByUser,
+} = require("./import.queries");
 const cron = require("node-cron");
 
 cron.schedule("* * * * *", () => {
@@ -40,4 +43,18 @@ const fileUploadToTable = async (req, res) => {
   }
 };
 
-module.exports = { fileUploadToTable };
+const getDataFromTable = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const data = await getFileUploadsByUser(id);
+    res.status(200).json({
+      message: "Data retrieved successfully",
+      data: data,
+    });
+  } catch (error) {
+    console.error("Error fetching data from table:", error);
+    res.status(500).json({ message: "Failed to fetch data" });
+  }
+};
+
+module.exports = { fileUploadToTable, getDataFromTable };

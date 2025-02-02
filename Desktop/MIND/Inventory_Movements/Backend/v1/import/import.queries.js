@@ -50,6 +50,19 @@ const updateFileSummary = async (fileId, summary) => {
   return updated;
 };
 
+const getFileUploadsByUser = async (user_id) => {
+  return await db("file_uploads")
+    .select(
+      "file_name",
+      "success_records",
+      "failed_records",
+      "status",
+      "error_file_url"
+    )
+    .where("user_id", user_id)
+    .orderBy("created_at", "desc");
+};
+
 const getFileDetailsByFileName = async (userId, fileName) => {
   try {
     const file = await db("file_uploads")
@@ -69,4 +82,5 @@ module.exports = {
   updateFileSummary,
   getFileDetailsByUrl,
   getFileDetailsByFileName,
+  getFileUploadsByUser,
 };
