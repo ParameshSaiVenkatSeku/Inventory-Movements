@@ -3,15 +3,13 @@ const knexConfig = require("../../knexfile");
 const db = knex(knexConfig);
 
 const insertFileData = async (userId, fileName, filePath) => {
-  const [insertedFile] = await db("file_uploads")
-    .insert({
-      user_id: userId,
-      file_name: fileName,
-      file_path: filePath,
-      status: "pending",
-    })
-    .returning("*");
-  return insertedFile;
+  const insertedIds = await db("file_uploads").insert({
+    user_id: userId,
+    file_name: fileName,
+    file_path: filePath,
+    status: "pending",
+  });
+  return { id: insertedIds[0], file_name: fileName, file_path: filePath };
 };
 
 const getPendingFileNames = async () => {
@@ -32,17 +30,13 @@ const updateFileProcessingSummary = async (fileId) => {
 };
 
 const updateFileSummary = async (fileId, summary) => {
-  const updated = await db("file_uploads")
-    .where("id", fileId)
-    .update({
-      total_records: summary.totalRecords,
-      success_records: summary.successRecords,
-      failed_records: summary.failedRecords,
-      error_file_url: summary.errorFileUrl,
-      status: "completed",
-    })
-    .returning("*");
-  return updated;
+  await db("file_uploads").where("id", fileId).update({
+    total_records: summary.totalRecords,
+    success_records: summary.successRecords,
+    failed_records: summary.failedRecords,
+    error_file_url: summary.errorFileUrl,
+    status: "completed",
+  });
 };
 
 const getFileUploadsByUser = async (user_id, limit, offset) => {
@@ -75,15 +69,11 @@ const getVendorByName = async (name) => {
 };
 
 const insertProduct = async (productData, trx = db) => {
-  await trx("products").insert(productData).returning("*");
-  console.log("queries - 81");
-  return await trx("products")
-    .select("product_id")
-    .where("product_name", productData.product_name);
+  const insertedIds = await trx("products").insert(productData);
+  return insertedIds[0];
 };
 
 const insertProductToVendor = async (productId, vendorId, trx = db) => {
-  console.log("productId - 86", productId);
   return await trx("product_to_vendor").insert({
     vendor_id: vendorId,
     product_id: productId,
@@ -104,14 +94,13 @@ const insertProductWithVendors = async (record, trx = db) => {
         ? record.status
         : "1",
   };
-  const product = await insertProduct(productData, trx);
-  console.log("product - 108", product);
+  const productId = await insertProduct(productData, trx);
   for (const vendorName of record.vendors) {
     const vendor = await getVendorByName(vendorName);
     if (!vendor) throw new Error("Invalid vendor");
-    await insertProductToVendor(product, vendor.vendor_id, trx);
+    await insertProductToVendor(productId, vendor.vendor_id, trx);
   }
-  return product;
+  return productId;
 };
 
 module.exports = {
