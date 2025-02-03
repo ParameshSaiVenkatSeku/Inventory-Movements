@@ -1,10 +1,12 @@
+// import.service.js
 const {
   insertFileData,
   updateFileSummary,
   updateFileProcessingSummary,
   getFileDetailsByUrl,
   getFileDetailsByFileName,
-  insertProductWithVendors,
+  getAllVendorNames,
+  getAllCategoryNames,
   db,
 } = require("./import.queries");
 const { getFileData, uploadBufferToS3 } = require("../../AWS/aws.controller");
@@ -12,19 +14,9 @@ const ExcelJS = require("exceljs");
 const { Worker } = require("worker_threads");
 const path = require("path");
 const os = require("os");
+const _ = require("underscore");
 
-const VALID_VENDORS = ["Zomato", "Swiggy", "Amazon", "Flipkart", "Blinkit"];
-const VALID_CATEGORIES = [
-  "Electronics",
-  "Furniture",
-  "Clothing",
-  "Food & Beverages",
-  "Health & Beauty",
-  "Sports & Outdoors",
-  "Toys & Games",
-  "Office Supplies",
-  "Books & Stationery",
-];
+// No longer hardcoding these—vendors/categories will come from the DB.
 
 const insertFileDetails = async (userId, fileName) => {
   let existingFile = await getFileDetailsByFileName(userId, fileName);
@@ -37,7 +29,7 @@ const insertFileDetails = async (userId, fileName) => {
       fileName = parts.join(".") + `(${counter}).` + ext;
     } else {
       fileName = originalFileName + `(${counter})`;
-    } //remove code
+    }
     counter++;
     existingFile = await getFileDetailsByFileName(userId, fileName);
   }
@@ -61,80 +53,104 @@ const parseExcelData = async (fileUrl) => {
   const worksheet = workbook.worksheets[0];
 
   const headerMapping = buildHeaderMapping(worksheet.getRow(1));
-  if (!headerMapping) throw new Error("Required columns not found"); //
+  if (!headerMapping) throw new Error("Required columns not found");
 
-  const totalRows = worksheet.rowCount;
-  const chunkSize = 1000;
-  let chunks = [];
-
-  for (let i = 2; i <= totalRows; i += chunkSize) {
-    const chunkEnd = Math.min(i + chunkSize - 1, totalRows);
-    let chunkRows = [];
-    for (let r = i; r <= chunkEnd; r++) {
-      chunkRows.push(worksheet.getRow(r).values.slice(1));
+  const allRows = [];
+  worksheet.eachRow((row, rowNumber) => {
+    if (rowNumber > 1) {
+      allRows.push(row.values.slice(1));
     }
-    chunks.push(chunkRows);
-  }
-
-  const results = await processChunksConcurrently(chunks, headerMapping);
-  let validRecords = [];
-  let invalidRecords = [];
-  results.forEach((result) => {
-    validRecords = validRecords.concat(result.validRecords);
-    invalidRecords = invalidRecords.concat(result.invalidRecords);
   });
+  const chunks = _.chunk(allRows, 500);
+
+  const validVendorNames = await getAllVendorNames();
+  const validCategoryNames = await getAllCategoryNames();
+
+  const maxWorkers = os.cpus().length;
+  let totalValidCount = 0;
+  let allInvalidRecords = [];
+
+  let index = 0;
+  async function workerRunner() {
+    while (index < chunks.length) {
+      const currentIndex = index++;
+      try {
+        const { validCount, invalidRecords } = await processChunkAndInsert(
+          chunks[currentIndex],
+          headerMapping,
+          validVendorNames,
+          validCategoryNames
+        );
+        totalValidCount += validCount;
+        allInvalidRecords = allInvalidRecords.concat(invalidRecords);
+      } catch (err) {
+        console.error("Error processing chunk:", err);
+      }
+    }
+  }
+  const runners = [];
+  for (let i = 0; i < maxWorkers; i++) {
+    runners.push(workerRunner());
+  }
+  await Promise.all(runners);
 
   let errorFileUrl = "";
-  if (invalidRecords.length > 0) {
+  if (allInvalidRecords.length > 0) {
     errorFileUrl = await generateAndUploadErrorExcel(
-      invalidRecords,
+      allInvalidRecords,
       originalFileName,
       userId
     );
   }
   const summary = {
-    totalRecords: totalRows - 1,
-    successRecords: validRecords.length,
-    failedRecords: invalidRecords.length,
+    totalRecords: allRows.length,
+    successRecords: totalValidCount,
+    failedRecords: allInvalidRecords.length,
     errorFileUrl,
   };
 
-  await insertValidRecords(validRecords);
   await updateFileSummary(fileId, summary);
-  return { ...summary, validRecords, invalidRecords };
+  return {
+    ...summary,
+    validRecordsInserted: totalValidCount,
+    invalidRecords: allInvalidRecords,
+  };
 };
 
-const processChunksConcurrently = async (chunks, headerMapping) => {
-  const maxWorkers = os.cpus().length;
-  // console.log("MAXWORKERS = ", maxWorkers);
-  let results = new Array(chunks.length);
-  let index = 0;
-
-  async function workerRunner() {
-    while (index < chunks.length) {
-      const currentIndex = index++;
-      try {
-        const result = await processChunk(chunks[currentIndex], headerMapping);
-        results[currentIndex] = result;
-      } catch (err) {
-        results[currentIndex] = { validRecords: [], invalidRecords: [] };
-        console.error("Worker error:", err);
-      }
-    }
+const processChunkAndInsert = async (
+  chunkRows,
+  headerMapping,
+  validVendorNames,
+  validCategoryNames
+) => {
+  const result = await processChunk(
+    chunkRows,
+    headerMapping,
+    validVendorNames,
+    validCategoryNames
+  );
+  let validCount = 0;
+  if (result.validRecords.length > 0) {
+    await insertValidRecords(result.validRecords);
+    validCount = result.validRecords.length;
   }
-
-  let runners = [];
-  for (let i = 0; i < maxWorkers; i++) {
-    runners.push(workerRunner());
-  }
-  await Promise.all(runners);
-  return results;
+  return { validCount, invalidRecords: result.invalidRecords };
 };
 
-const processChunk = (chunkRows, headerMapping) => {
+const processChunk = (
+  chunkRows,
+  headerMapping,
+  validVendorNames,
+  validCategoryNames
+) => {
   return new Promise((resolve, reject) => {
     const worker = new Worker(path.join(__dirname, "worker.js"), {
-      workerData: { chunkRows, headerMapping, VALID_VENDORS, VALID_CATEGORIES },
+      workerData: {
+        chunkRows,
+        headerMapping,
+        validVendorNames,
+        validCategoryNames,
+      },
     });
     worker.on("message", (result) => resolve(result));
     worker.on("error", reject);
@@ -210,12 +226,52 @@ const generateAndUploadErrorExcel = async (
 
 const insertValidRecords = async (validRecords) => {
   await db.transaction(async (trx) => {
-    for (const record of validRecords) {
-      try {
-        await insertProductWithVendors(record, trx);
-      } catch (e) {
-        console.error("Error inserting record:", e);
+    try {
+      const {
+        getAllCategoryMapping,
+        getAllVendorMapping,
+      } = require("./import.queries");
+      const categoryMapping = await getAllCategoryMapping(trx);
+      const vendorMapping = await getAllVendorMapping(trx);
+
+      const productInserts = validRecords.map((record) => ({
+        product_name: record.productName,
+        category_id: categoryMapping[record.category],
+        quantity_in_stock: record.quantity,
+        unit_price: record.unitPrice,
+        status:
+          record.status && ["0", "1", "2", "99"].includes(record.status)
+            ? record.status
+            : "1",
+      }));
+
+      const insertedProductIds = await trx("products")
+        .insert(productInserts)
+        .returning("id");
+
+      const productToVendorInserts = [];
+      validRecords.forEach((record, idx) => {
+        const productId = insertedProductIds[idx];
+        record.vendors.forEach((vendorName) => {
+          const vendorId = vendorMapping[vendorName];
+          if (vendorId) {
+            productToVendorInserts.push({
+              product_id: productId,
+              vendor_id: vendorId,
+              status: "0",
+            });
+          }
+        });
+      });
+
+      if (productToVendorInserts.length > 0) {
+        await trx("product_to_vendors").insert(productToVendorInserts);
       }
+      await trx.commit();
+    } catch (error) {
+      await trx.rollback();
+      console.error("Error during batch insert:", error);
+      throw error;
     }
   });
 };

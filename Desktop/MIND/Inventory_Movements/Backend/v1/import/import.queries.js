@@ -1,3 +1,4 @@
+// import.queries.js
 const knex = require("knex");
 const knexConfig = require("../../knexfile");
 const db = knex(knexConfig);
@@ -103,6 +104,35 @@ const insertProductWithVendors = async (record, trx = db) => {
   return productId;
 };
 
+const getAllVendorNames = async () => {
+  const vendors = await db("vendors").select("vendor_name");
+  return vendors.map((v) => v.vendor_name);
+};
+
+const getAllCategoryNames = async () => {
+  const categories = await db("categories").select("category_name");
+  return categories.map((c) => c.category_name);
+};
+
+const getAllVendorMapping = async (trx = db) => {
+  const vendors = await trx("vendors").select("vendor_name", "vendor_id");
+  return vendors.reduce((acc, cur) => {
+    acc[cur.vendor_name] = cur.vendor_id;
+    return acc;
+  }, {});
+};
+
+const getAllCategoryMapping = async (trx = db) => {
+  const categories = await trx("categories").select(
+    "category_name",
+    "category_id"
+  );
+  return categories.reduce((acc, cur) => {
+    acc[cur.category_name] = cur.category_id;
+    return acc;
+  }, {});
+};
+
 module.exports = {
   insertFileData,
   getPendingFileNames,
@@ -116,5 +146,9 @@ module.exports = {
   insertProduct,
   insertProductToVendor,
   insertProductWithVendors,
+  getAllVendorNames,
+  getAllCategoryNames,
+  getAllVendorMapping,
+  getAllCategoryMapping,
   db,
 };

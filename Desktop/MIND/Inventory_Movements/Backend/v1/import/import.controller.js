@@ -1,11 +1,9 @@
+// import.controller.js
 const { insertFileDetails, parseExcelData } = require("./import.service");
-const {
-  getPendingFileNames,
-  getFileUploadsByUser,
-} = require("./import.queries");
+const { getPendingFileNames, getFileUploadsByUser } = require("./import.queries");
 const cron = require("node-cron");
 
-// Run the cron job every minute.
+// Cron job runs every minute.
 cron.schedule("* * * * *", () => {
   console.log("Cron is executing...");
   startValidation();
@@ -17,7 +15,9 @@ const startValidation = async () => {
     if (pendingFiles && pendingFiles.length > 0) {
       for (const file of pendingFiles) {
         console.log(`Processing file: ${file.file_name}`);
-        parseExcelData(file.file_path);
+        parseExcelData(file.file_path).catch((err) =>
+          console.error("Error processing file:", err)
+        );
       }
     } else {
       console.log("No pending files to process.");

@@ -1,8 +1,12 @@
+// worker.js
 const { parentPort, workerData } = require("worker_threads");
 const Joi = require("joi");
 
-const { chunkRows, headerMapping, VALID_VENDORS, VALID_CATEGORIES } =
+const { chunkRows, headerMapping, validVendorNames, validCategoryNames } =
   workerData;
+
+const VENDOR_NAMES = validVendorNames;
+const CATEGORY_NAMES = validCategoryNames;
 
 const rowSchema = Joi.object({
   productName: Joi.string()
@@ -20,22 +24,22 @@ const rowSchema = Joi.object({
       const vendors = value.split(",").map((v) => v.trim());
       if (!vendors.length) return helpers.error("string.empty");
       for (let v of vendors) {
-        if (!VALID_VENDORS.includes(v)) return helpers.error("any.invalid");
+        if (!VENDOR_NAMES.includes(v)) return helpers.error("any.invalid");
       }
       return value;
     })
     .messages({
-      "any.invalid": `Vendor is invalid. Allowed vendors are: ${VALID_VENDORS.join(
+      "any.invalid": `Vendor is invalid. Allowed vendors are: ${VENDOR_NAMES.join(
         ", "
       )}.`,
       "string.empty": "Vendor field cannot be empty.",
       "any.required": "Vendor field is required.",
     }),
   category: Joi.string()
-    .valid(...VALID_CATEGORIES)
+    .valid(...CATEGORY_NAMES)
     .required()
     .messages({
-      "any.only": `Category is invalid. Allowed categories are: ${VALID_CATEGORIES.join(
+      "any.only": `Category is invalid. Allowed categories are: ${CATEGORY_NAMES.join(
         ", "
       )}.`,
       "string.empty": "Category cannot be empty.",
