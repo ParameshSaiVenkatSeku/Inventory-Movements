@@ -11,7 +11,7 @@ export interface FileUpload {
   failedRecords: number;
   status: string;
   errorFileUrl?: string;
-  excelData?: any[]; // Add excelData to store the parsed Excel content
+  excelData?: any[];
 }
 
 export interface FileUploadResponse {
@@ -27,20 +27,19 @@ export interface FileUploadResponse {
 export class ImportFileComponent implements OnInit, OnDestroy {
   fileReports: FileUpload[] = [];
   pollingSubscription!: Subscription;
+  pageNo = 1;
+  limit = 5;
+  hasMore = false;
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    this.fetchFileUploads().subscribe((response: FileUploadResponse) => {
-      console.log('Initial Data:', response);
-      this.fileReports = response.data || [];
-    });
-
+    this.loadPage();
     this.pollingSubscription = interval(5000)
       .pipe(switchMap(() => this.fetchFileUploads()))
       .subscribe((response: FileUploadResponse) => {
-        console.log('Polling Data:', response);
         this.fileReports = response.data || [];
+        this.cdr.detectChanges();
       });
   }
 
@@ -50,50 +49,45 @@ export class ImportFileComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Fetch the file upload info from backend
+  loadPage(): void {
+    this.fetchFileUploads().subscribe((response: FileUploadResponse) => {
+      this.fileReports = response.data || [];
+      this.hasMore = response.data.length === this.limit;
+    });
+  }
+
   fetchFileUploads(): Observable<FileUploadResponse> {
     const token = sessionStorage.getItem('access_token');
-    let userId;
-
-    if (token) {
-      userId = JSON.parse(atob(token.split('.')[1]));
-    } else {
-      console.error('No access token found');
-      return new Observable<FileUploadResponse>(); // Prevent errors
-    }
-
+    if (!token) return new Observable<FileUploadResponse>();
+    const userId = JSON.parse(atob(token.split('.')[1]));
+    const offset = (this.pageNo - 1) * this.limit;
     return this.http
       .get<FileUploadResponse>(
-        `${environment.Url}/imports/getData/${userId.user_id}`
+        `${environment.Url}/imports/getData/${userId.user_id}?limit=${this.limit}&offset=${offset}`
       )
       .pipe(
         map((response: any) => ({
           message: response.message,
           data: response.data.map((file: any) => {
-            let excelData: any[] = [];
-
-            // If there is an errorFileUrl, fetch the file and parse it
             if (file.error_file_url) {
               this.fetchExcelFile(file.error_file_url).subscribe((data) => {
                 file.excelData = data;
-                this.cdr.detectChanges(); // Trigger change detection after updating excelData
+                this.cdr.detectChanges();
               });
             }
-
             return {
               fileName: file.file_name,
               successRecords: file.success_records,
               failedRecords: file.failed_records,
-              status: file.status, // Directly use the status
+              status: file.status,
               errorFileUrl: file.error_file_url || null,
-              excelData: excelData, // Store the Excel data here
+              excelData: [],
             };
           }),
         }))
       );
   }
 
-  // Fetch and parse the Excel file from the provided URL (S3)
   fetchExcelFile(fileUrl: string): Observable<any[]> {
     return this.http.get(fileUrl, { responseType: 'arraybuffer' }).pipe(
       map((data: ArrayBuffer) => {
@@ -102,20 +96,32 @@ export class ImportFileComponent implements OnInit, OnDestroy {
         });
         const reader = new FileReader();
         let excelData: any[] = [];
-
         reader.onload = (e: any) => {
           const binaryData = e.target.result;
           const wb = XLSX.read(binaryData, { type: 'binary' });
-          const sheet = wb.Sheets[wb.SheetNames[0]]; // Read the first sheet
+          const sheet = wb.Sheets[wb.SheetNames[0]];
           excelData = XLSX.utils.sheet_to_json(sheet, {
-            header: 1, // Extract data with the first row as header
-            defval: '', // Handle undefined cells
+            header: 1,
+            defval: '',
           });
         };
         reader.readAsBinaryString(blob);
-
-        return excelData; // Return the parsed Excel data
+        return excelData;
       })
     );
+  }
+
+  nextPage(): void {
+    if (this.hasMore) {
+      this.pageNo++;
+      this.loadPage();
+    }
+  }
+
+  prevPage(): void {
+    if (this.pageNo > 1) {
+      this.pageNo--;
+      this.loadPage();
+    }
   }
 }

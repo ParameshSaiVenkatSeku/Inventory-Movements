@@ -45,8 +45,11 @@ const fileUploadToTable = async (req, res) => {
 
 const getDataFromTable = async (req, res) => {
   try {
-    const id = req.params.id;
-    const data = await getFileUploadsByUser(id);
+    const id = req.params.id,
+      page = 1,
+      limit = 3,
+      offset = (page - 1) * limit;
+    const data = await getFileUploadsByUser(id, limit, offset);
     res.status(200).json({
       message: "Data retrieved successfully",
       data: data,

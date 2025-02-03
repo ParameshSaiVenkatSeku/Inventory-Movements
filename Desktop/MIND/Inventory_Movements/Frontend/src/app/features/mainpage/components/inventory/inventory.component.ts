@@ -297,7 +297,6 @@ export class InventoryComponent implements OnInit {
       (key) => this.selectedFilters[key]
     );
 
-    // console.log(store);
     this.main
       .filterProduct(
         this.filterData,
@@ -384,24 +383,17 @@ export class InventoryComponent implements OnInit {
     doc.setFontSize(16);
     doc.text('Product Details', 20, 20);
     doc.setFontSize(12);
-    // console.log(product);
     doc.text(`Product Name: ${product.product_name}`, 20, 30);
-    // console.log(product.product_name);
     doc.text(`Category: ${product.category_name}`, 20, 40);
-    // console.log(product.category_name);
     doc.text(
       `Status: ${product.status === '1' ? 'Available' : 'Sold Out'}`,
       20,
       50
     );
     doc.text(`Quantity: ${product.quantity_in_stock}`, 20, 60);
-    // console.log(product.quantity_in_stock);
     doc.text(`Unit: ${product.unit_price}`, 20, 70);
-    // console.log(product.unit_price);
     doc.text(`Vendors: ${product.vendor_name}`, 20, 80);
-    // console.log(product.vendor_name);
     doc.text(`Image Url: ${product.product_image}`, 20, 90);
-    // console.log(product.product_image);
     doc.save(`${product.product_name}_details.pdf`);
   }
 
@@ -412,10 +404,8 @@ export class InventoryComponent implements OnInit {
       .post(`${environment.Url}/dashboard/product`, productData)
       .subscribe(
         (data) => {
-          // console.log('New product added:', data);
         },
         (error) => {
-          // console.error('Error adding product:', error);
         }
       );
     if (productData.status === 'Available') productData.status = 1;
@@ -429,7 +419,7 @@ export class InventoryComponent implements OnInit {
         : this.productData;
 
       const dataWithoutProductIdAndChecked = filteredData.map((item: any) => {
-        const { product_id, checked, ...rest } = item; // Destructure and omit these properties
+        const { product_id, checked, ...rest } = item;
         return rest;
       });
 

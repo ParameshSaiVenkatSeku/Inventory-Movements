@@ -18,7 +18,6 @@
         <td *ngIf="file.errorFileUrl">
           <div class="file-preview-container">
             <div class="mt-2">
-              <!-- Display the Excel preview table if data exists -->
               <div
                 class="table-container table-striped"
                 *ngIf="file.excelData && file.excelData.length > 0"
@@ -38,16 +37,6 @@
                   </tbody>
                 </table>
               </div>
-
-              <!-- No data message if excelData is empty -->
-              <!-- <p
-                *ngIf="file.excelData && file.excelData.length === 0"
-                class="no-data-message"
-              >
-                No data available to display.
-              </p> -->
-
-              <!-- Provide a download link for the file, centered -->
               <div class="d-flex justify-content-center align-items-center">
                 <a [href]="file.errorFileUrl" class="text-center">
                   <i class="bi bi-box-arrow-down" style="font-size: 1.3rem"></i>
@@ -59,4 +48,17 @@
       </tr>
     </tbody>
   </table>
+</div>
+<div class="d-flex justify-content-between align-items-center mt-3">
+  <button
+    class="btn btn-primary"
+    (click)="prevPage()"
+    [disabled]="pageNo === 1"
+  >
+    Previous
+  </button>
+  <span>Page {{ pageNo }}</span>
+  <button class="btn btn-primary" (click)="nextPage()" [disabled]="!hasMore">
+    Next
+  </button>
 </div>

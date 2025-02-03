@@ -151,7 +151,6 @@ const uploadBufferToS3 = async (buffer, fileName, folderName) => {
     Body: buffer,
     ContentType:
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    ACL: "public-read",
   };
   try {
     const uploadResult = await s3.upload(params).promise();
