@@ -38,8 +38,18 @@
                 </table>
               </div>
               <div class="d-flex justify-content-center align-items-center">
-                <a [href]="file.errorFileUrl" class="text-center">
+                <a [href]="file.errorFileUrl" download class="text-center me-3">
                   <i class="bi bi-box-arrow-down" style="font-size: 1.3rem"></i>
+                </a>
+                <a
+                  [href]="
+                    'https://view.officeapps.live.com/op/embed.aspx?src=' +
+                    file.errorFileUrl
+                  "
+                  target="_blank"
+                  class="text-center"
+                >
+                  <i class="bi bi-eye" style="font-size: 1.3rem"></i>
                 </a>
               </div>
             </div>

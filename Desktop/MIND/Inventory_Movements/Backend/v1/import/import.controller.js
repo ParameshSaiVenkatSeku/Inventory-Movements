@@ -17,7 +17,6 @@ const startValidation = async () => {
     if (pendingFiles && pendingFiles.length > 0) {
       for (const file of pendingFiles) {
         console.log(`Processing file: ${file.file_name}`);
-        // parseExcelData spawns worker threads for processing chunks.
         parseExcelData(file.file_path);
       }
     } else {

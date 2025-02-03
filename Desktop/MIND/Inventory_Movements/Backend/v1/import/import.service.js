@@ -37,7 +37,7 @@ const insertFileDetails = async (userId, fileName) => {
       fileName = parts.join(".") + `(${counter}).` + ext;
     } else {
       fileName = originalFileName + `(${counter})`;
-    }
+    } //remove code
     counter++;
     existingFile = await getFileDetailsByFileName(userId, fileName);
   }
@@ -61,10 +61,10 @@ const parseExcelData = async (fileUrl) => {
   const worksheet = workbook.worksheets[0];
 
   const headerMapping = buildHeaderMapping(worksheet.getRow(1));
-  if (!headerMapping) throw new Error("Required columns not found");
+  if (!headerMapping) throw new Error("Required columns not found"); //
 
   const totalRows = worksheet.rowCount;
-  const chunkSize = 100;
+  const chunkSize = 1000;
   let chunks = [];
 
   for (let i = 2; i <= totalRows; i += chunkSize) {
@@ -106,7 +106,7 @@ const parseExcelData = async (fileUrl) => {
 
 const processChunksConcurrently = async (chunks, headerMapping) => {
   const maxWorkers = os.cpus().length;
-  console.log("MAXWORKERS = ", maxWorkers);
+  // console.log("MAXWORKERS = ", maxWorkers);
   let results = new Array(chunks.length);
   let index = 0;
 
