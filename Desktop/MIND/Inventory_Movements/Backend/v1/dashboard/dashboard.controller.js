@@ -23,14 +23,14 @@ const postProduct = async (req, res) => {
         unit_price: unit,
         status: status,
       });
-      await db("product_to_vendor").where({ product_id: productId }).del();
+      await db("product_to_vendors").where({ product_id: productId }).del();
       const vendorData = vendor.map((v) => ({
         vendor_id: v,
         product_id: productId,
         status: "1",
       }));
 
-      await db("product_to_vendor").insert(vendorData);
+      await db("product_to_vendors").insert(vendorData);
     } else {
       const [newProductId] = await db("products").insert(
         {
@@ -49,7 +49,7 @@ const postProduct = async (req, res) => {
         status: "1",
       }));
 
-      await db("product_to_vendor").insert(vendorData);
+      await db("product_to_vendors").insert(vendorData);
     }
 
     const products = await db("products as p")
@@ -63,7 +63,7 @@ const postProduct = async (req, res) => {
         db.raw('GROUP_CONCAT(v.vendor_name SEPARATOR ", ") as vendors')
       )
       .leftJoin("categories as c", "p.category_id", "c.category_id")
-      .leftJoin("product_to_vendor as pv", "p.product_id", "pv.product_id")
+      .leftJoin("product_to_vendors as pv", "p.product_id", "pv.product_id")
       .leftJoin("vendors as v", "pv.vendor_id", "v.vendor_id")
       .where("p.status", "!=", 99)
       .groupBy("p.product_id");
@@ -84,7 +84,7 @@ const deleteProduct = async (req, res) => {
       .where("product_id", productId)
       .update({ status: "99" });
 
-    await db("product_to_vendor")
+    await db("product_to_vendors")
       .where("product_id", productId)
       .update({ status: "99" });
     res.send({
@@ -131,7 +131,7 @@ const getAllProducts = async (req, res, next) => {
         db.raw("GROUP_CONCAT(v.vendor_name) as vendor_name")
       )
       .leftJoin("categories as c", "p.category_id", "c.category_id")
-      .leftJoin("product_to_vendor as pv", "p.product_id", "pv.product_id")
+      .leftJoin("product_to_vendors as pv", "p.product_id", "pv.product_id")
       .leftJoin("vendors as v", "pv.vendor_id", "v.vendor_id")
       .groupBy("p.product_id");
 
@@ -176,7 +176,7 @@ const getAllProducts = async (req, res, next) => {
 
     const paginationData = db("products as p")
       .leftJoin("categories as c", "p.category_id", "c.category_id")
-      .leftJoin("product_to_vendor as pv", "p.product_id", "pv.product_id")
+      .leftJoin("product_to_vendors as pv", "p.product_id", "pv.product_id")
       .leftJoin("vendors as v", "pv.vendor_id", "v.vendor_id");
 
     if (product_name) {
@@ -250,14 +250,14 @@ const moveToCart = async (req, res) => {
 
     const vendorId = vendor.vendor_id;
 
-    const existingCartItem = await trx("product_cards")
+    const existingCartItem = await trx("product_carts")
       .where("product_id", productId)
       .andWhere("vendor_id", vendorId)
       .andWhere("user_id", userId.user_id)
       .first();
 
     if (existingCartItem) {
-      await trx("product_cards")
+      await trx("product_carts")
         .where("product_id", productId)
         .andWhere("vendor_id", vendorId)
         .andWhere("user_id", userId.user_id)
@@ -265,7 +265,7 @@ const moveToCart = async (req, res) => {
           quantity: existingCartItem.quantity + quantity,
         });
     } else {
-      await trx("product_cards").insert({
+      await trx("product_carts").insert({
         product_id: productId,
         product_name: product.product_name,
         quantity: quantity,
@@ -292,7 +292,7 @@ const moveToCart = async (req, res) => {
 
 const getCartData = async (req, res) => {
   try {
-    const cartItems = await db("product_cards").select(
+    const cartItems = await db("product_carts").select(
       "product_id",
       "product_name",
       "quantity",
@@ -314,7 +314,7 @@ const deleteCartData = async (req, res) => {
       return res.status(400).send({ message: "Item ID is required" });
     }
 
-    const cartItem = await db("product_cards")
+    const cartItem = await db("product_carts")
       .where({ product_id: itemId, vendor_name: vendorName })
       .select("quantity")
       .first();
@@ -325,7 +325,7 @@ const deleteCartData = async (req, res) => {
 
     const itemQuantity = cartItem.quantity;
 
-    const deletedCount = await db("product_cards")
+    const deletedCount = await db("product_carts")
       .where({ product_id: itemId, vendor_name: vendorName })
       .del();
 
@@ -421,7 +421,7 @@ const importData = async (req, res) => {
         }
 
         for (const vendorId of vendorIds) {
-          const existingProductVendor = await db("product_to_vendor")
+          const existingProductVendor = await db("product_to_vendors")
             .where({
               product_id: existingProduct.product_id,
               vendor_id: vendorId,
@@ -429,7 +429,7 @@ const importData = async (req, res) => {
             .first();
 
           if (!existingProductVendor) {
-            await db("product_to_vendor").insert({
+            await db("product_to_vendors").insert({
               product_id: existingProduct.product_id,
               vendor_id: vendorId,
               status: "1",
@@ -453,7 +453,7 @@ const importData = async (req, res) => {
           .first();
 
         for (const vendorId of vendorIds) {
-          await db("product_to_vendor").insert({
+          await db("product_to_vendors").insert({
             product_id: newProduct.product_id,
             vendor_id: vendorId,
             status: "1",

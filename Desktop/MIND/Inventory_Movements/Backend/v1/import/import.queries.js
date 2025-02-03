@@ -74,7 +74,7 @@ const insertProduct = async (productData, trx = db) => {
 };
 
 const insertProductToVendor = async (productId, vendorId, trx = db) => {
-  return await trx("product_to_vendor").insert({
+  return await trx("product_to_vendors").insert({
     vendor_id: vendorId,
     product_id: productId,
     status: "0",

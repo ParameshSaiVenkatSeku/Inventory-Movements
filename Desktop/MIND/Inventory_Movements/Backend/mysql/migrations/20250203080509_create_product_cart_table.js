@@ -1,6 +1,6 @@
 exports.up = function (knex) {
-  return knex.schema.createTable("product_cards", function (table) {
-    table.increments("card_id").primary();
+  return knex.schema.createTable("product_carts", function (table) {
+    table.increments("cart_id").primary();
     table
       .integer("product_id")
       .unsigned()
@@ -29,5 +29,5 @@ exports.up = function (knex) {
 };
 
 exports.down = function (knex) {
-  return knex.schema.dropTableIfExists("cards");
+  return knex.schema.dropTableIfExists("product_carts");
 };
