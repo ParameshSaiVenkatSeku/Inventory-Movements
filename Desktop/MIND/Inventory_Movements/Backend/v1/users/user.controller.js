@@ -95,4 +95,14 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-module.exports = { getAllUsers, updateUser, deleteUser, getUser };
+const forgotPassword = async (req, res) => {};
+const resetPassword = async (req, res) => {};
+
+module.exports = {
+  getAllUsers,
+  updateUser,
+  deleteUser,
+  getUser,
+  forgotPassword,
+  resetPassword,
+};

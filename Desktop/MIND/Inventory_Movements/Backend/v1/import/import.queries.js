@@ -71,6 +71,7 @@ const getVendorByName = async (name) => {
 
 const insertProduct = async (productData, trx = db) => {
   const insertedIds = await trx("products").insert(productData);
+  console.log("import queries -  74", insertedIds[0]);
   return insertedIds[0];
 };
 
@@ -96,6 +97,7 @@ const insertProductWithVendors = async (record, trx = db) => {
         : "1",
   };
   const productId = await insertProduct(productData, trx);
+  console.log("import queries - 99", productId);
   for (const vendorName of record.vendors) {
     const vendor = await getVendorByName(vendorName);
     if (!vendor) throw new Error("Invalid vendor");

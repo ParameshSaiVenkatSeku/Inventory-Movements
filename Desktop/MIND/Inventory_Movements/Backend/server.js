@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const dotenv = require("dotenv");
-
+const setupSwagger = require("./utils/swagger");
 const authRoutes = require("./v1/auth/auth.routes");
 const userRoutes = require("./v1/users/user.routes");
 const awsRoutes = require("./AWS/aws.routes");
@@ -18,6 +18,8 @@ const rateLimit = require("express-rate-limit");
 dotenv.config();
 
 const app = express();
+setupSwagger(app);
+
 const PORT = process.env.PORT || 3000;
 
 const limiter = rateLimit({

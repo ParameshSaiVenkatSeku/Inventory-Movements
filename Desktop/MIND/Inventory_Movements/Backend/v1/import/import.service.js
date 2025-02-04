@@ -1,4 +1,3 @@
-// import.service.js
 const {
   insertFileData,
   updateFileSummary,
@@ -15,8 +14,6 @@ const { Worker } = require("worker_threads");
 const path = require("path");
 const os = require("os");
 const _ = require("underscore");
-
-// No longer hardcoding these—vendors/categories will come from the DB.
 
 const insertFileDetails = async (userId, fileName) => {
   let existingFile = await getFileDetailsByFileName(userId, fileName);
