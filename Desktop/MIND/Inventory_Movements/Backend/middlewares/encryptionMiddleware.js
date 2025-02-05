@@ -3,9 +3,13 @@ const CryptoJS = require("crypto-js");
 const encryptionMiddleware = (req, res, next) => {
   const secretKey = "akriviaautomation";
   try {
+    // console.log("body", req.body);
+
     if (!req.body.email || !req.body.password) {
+      // console.log(req.body.email, req.body.password);
       throw new Error("Email or Password missing in the request body");
     }
+    console.log(req.body, "fghjuyfcvytfcvgvbgvbhgv");
     const decryptedEmail = CryptoJS.AES.decrypt(
       req.body.email,
       secretKey
@@ -15,8 +19,8 @@ const encryptionMiddleware = (req, res, next) => {
       secretKey
     ).toString(CryptoJS.enc.Utf8);
 
+    console.log(decryptedEmail, decryptedPassword);
     if (!decryptedEmail || !decryptedPassword) {
-      ī;
       throw new Error("Decryption resulted in empty values");
     }
 

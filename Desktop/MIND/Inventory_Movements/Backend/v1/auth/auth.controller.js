@@ -6,14 +6,20 @@ const knexConfig = require("./../../knexfile");
 const { signupUserSchema, loginUserSchema } = require("./auth.utils");
 const asyncErrorHandler = require("../../utils/asyncErrorHandler");
 const CustomError = require("../../utils/CustomError");
+
 const db = knex(knexConfig);
 Model.knex(db);
+
 const JWT_SECRET = "AkriviaHCM";
-const Refresh_secret = "AkriviaAutomation";
+const REFRESH_SECRET = "AkriviaAutomation";
 
 function generateAccessToken(user) {
   return jwt.sign(
-    { user_id: user.user_id, username: user.username, email: user.email },
+    {
+      user_id: user.user_id,
+      username: user.username,
+      email: user.email,
+    },
     JWT_SECRET,
     { expiresIn: "1h" }
   );
@@ -21,8 +27,12 @@ function generateAccessToken(user) {
 
 function generateRefreshToken(user) {
   return jwt.sign(
-    { user_id: user.user_id, username: user.username, email: user.email },
-    Refresh_secret,
+    {
+      user_id: user.user_id,
+      username: user.username,
+      email: user.email,
+    },
+    REFRESH_SECRET,
     { expiresIn: "7d" }
   );
 }
@@ -34,41 +44,37 @@ const CreateUser = asyncErrorHandler(async (req, res) => {
     return res.status(400).json({ message: error.details[0].message });
   }
 
-  try {
-    const existingUser = await db("users").where({ email }).first();
-    if (existingUser) {
-      return res.status(400).json({ message: "Email already exists" });
-    }
-
-    const username = `${first_name.toLowerCase()} ${last_name.toLowerCase()}`;
-    const existingUserName = await db("users").where({ username }).first();
-    if (existingUserName) {
-      return res.status(400).json({
-        message:
-          "The combination already exists; try changing firstname or lastname",
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const [user_id] = await db("users").insert({
-      first_name,
-      username,
-      password: hashedPassword,
-      email,
-      status: "0",
-    });
-
-    res.status(201).json({
-      message: "User created successfully",
-      user_id,
-      first_name,
-      last_name,
-      email,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Internal server error" });
+  const existingUser = await db("users").where({ email }).first();
+  if (existingUser) {
+    return res.status(400).json({ message: "Email already exists" });
   }
+
+  const username = `${first_name.toLowerCase()}_${last_name.toLowerCase()}`;
+  const existingUserName = await db("users").where({ username }).first();
+  if (existingUserName) {
+    return res.status(400).json({
+      message:
+        "The username combination already exists; try modifying your first name or last name",
+    });
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const [user_id] = await db("users").insert({
+    first_name,
+    last_name,
+    username,
+    password: hashedPassword,
+    email,
+    status: "0",
+  });
+
+  res.status(201).json({
+    message: "User created successfully",
+    user_id,
+    first_name,
+    last_name,
+    email,
+  });
 });
 
 const loginUser = asyncErrorHandler(async (req, res) => {
@@ -100,20 +106,26 @@ const loginUser = asyncErrorHandler(async (req, res) => {
   });
 });
 
-const RefreshToken = async (req, res) => {
+const RefreshToken = asyncErrorHandler(async (req, res) => {
   const { refresh_token } = req.body;
   if (!refresh_token) {
     return res.status(401).json({ message: "Refresh token is required" });
   }
-  jwt.verify(refresh_token, Refresh_secret, (err, decoded) => {
+
+  jwt.verify(refresh_token, REFRESH_SECRET, (err, decoded) => {
     if (err) {
       return res
         .status(403)
         .json({ message: "Invalid or expired refresh token" });
     }
+
     const newAccessToken = generateAccessToken(decoded);
-    const refreshToken = generateRefreshToken(decoded);
-    res.json({ access_token: newAccessToken, refresh_token: refreshToken });
+    const newRefreshToken = generateRefreshToken(decoded);
+    res.status(200).json({
+      access_token: newAccessToken,
+      refresh_token: newRefreshToken,
+    });
   });
-};
+});
+
 module.exports = { CreateUser, loginUser, RefreshToken };

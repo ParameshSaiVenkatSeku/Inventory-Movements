@@ -150,7 +150,7 @@ dashboard.delete("/product/:productId", deleteProduct);
  *       200:
  *         description: Products retrieved successfully.
  */
-dashboard.get("/filterProduct", authenticateToken, getAllProducts);
+dashboard.get("/filterProduct", getAllProducts);
 
 /**
  * @swagger

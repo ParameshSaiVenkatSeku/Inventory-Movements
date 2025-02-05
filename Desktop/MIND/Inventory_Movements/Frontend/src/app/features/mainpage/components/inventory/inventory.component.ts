@@ -92,7 +92,7 @@ export class InventoryComponent implements OnInit {
       }
       // console.log(userId);
       const presignedUrlResponse = await this.http
-        .post<any>(`${environment.Url}/api/get-presigned-url`, {
+        .post<any>(`${environment.Url}/api/v1/aws/get-presigned-url`, {
           fileName,
           fileType,
           userId,
@@ -114,7 +114,7 @@ export class InventoryComponent implements OnInit {
         .toPromise();
 
       this.http
-        .post(`${environment.Url}/imports/upload-file/`, {
+        .post(`${environment.Url}/api/v1/imports/upload-file/`, {
           fileName: this.selectedFile.name,
           userId: userId,
         })
@@ -135,7 +135,7 @@ export class InventoryComponent implements OnInit {
   uploadExcelData(excelData: any[]) {
     if (excelData.length > 0) {
       this.http
-        .post(`${environment.Url}/dashboard/import-data`, {
+        .post(`${environment.Url}/api/v1/dashboard/import-data`, {
           csvData: excelData,
         })
         .subscribe(
@@ -170,9 +170,12 @@ export class InventoryComponent implements OnInit {
   removeFromCart(item: any) {
     // console.log(item);
     this.http
-      .delete(`${environment.Url}/dashboard/deleteItem/${item.product_id}`, {
-        body: { vendorName: item.vendor_name }, // Add vendor name in the body
-      })
+      .delete(
+        `${environment.Url}/api/v1/dashboard/deleteItem/${item.product_id}`,
+        {
+          body: { vendorName: item.vendor_name }, // Add vendor name in the body
+        }
+      )
       .subscribe({
         next: (response) => {
           // console.log('Item deleted:', response);
@@ -235,7 +238,7 @@ export class InventoryComponent implements OnInit {
 
     this.getCartData();
     this.http
-      .get(`${environment.Url}/dashboard/categories`)
+      .get(`${environment.Url}/api/v1/dashboard/categories`)
       .subscribe((data) => {
         this.categories = data;
       });
@@ -251,7 +254,7 @@ export class InventoryComponent implements OnInit {
   }
 
   getCartData(): void {
-    this.http.get(`${environment.Url}/dashboard/cartData`).subscribe(
+    this.http.get(`${environment.Url}/api/v1/dashboard/cartData`).subscribe(
       (response: any) => {
         this.cartItems = response.data;
       },
@@ -296,19 +299,22 @@ export class InventoryComponent implements OnInit {
     const store = Object.keys(this.selectedFilters).filter(
       (key) => this.selectedFilters[key]
     );
-
     this.main
       .filterProduct(
         this.filterData,
         this.limit,
         this.pageNo,
-        this.searchText,
+        this.searchTerm,
         store
       )
       .subscribe({
         next: (res: any) => {
-          // console.log(res);
-          this.productData = res.data;
+          this.productData = res.data.map((product: any) => {
+            if (!product.product_image) {
+              product.product_image = 'assets/images/igris_pfp.webp'; // Set your default image URL here
+            }
+            return product;
+          });
           this.totalPage = res.pagination.totalPage;
           this.totalcount = res.pagination.totalCount;
         },
@@ -335,7 +341,9 @@ export class InventoryComponent implements OnInit {
   confirmDelete() {
     if (this.productToDelete !== null) {
       this.http
-        .delete(`${environment.Url}/dashboard/product/${this.productToDelete}`)
+        .delete(
+          `${environment.Url}/api/v1/dashboard/product/${this.productToDelete}`
+        )
         .subscribe(
           (response) => {
             // console.log('Product soft deleted successfully');
@@ -367,7 +375,7 @@ export class InventoryComponent implements OnInit {
 
   uploadData(data: any): void {
     this.http
-      .post(`${environment.Url}/dashboard/upload/excel`, { data })
+      .post(`${environment.Url}/api/v1/dashboard/upload/excel`, { data })
       .subscribe(
         (response) => {
           // console.log('Data uploaded successfully:', response);
@@ -393,6 +401,8 @@ export class InventoryComponent implements OnInit {
     doc.text(`Quantity: ${product.quantity_in_stock}`, 20, 60);
     doc.text(`Unit: ${product.unit_price}`, 20, 70);
     doc.text(`Vendors: ${product.vendor_name}`, 20, 80);
+    if (!product.product_image)
+      product.product_image = 'assets/images/igris_pfp.webp';
     doc.text(`Image Url: ${product.product_image}`, 20, 90);
     doc.save(`${product.product_name}_details.pdf`);
   }
@@ -401,12 +411,10 @@ export class InventoryComponent implements OnInit {
 
   handleform(productData: any) {
     this.http
-      .post(`${environment.Url}/dashboard/product`, productData)
+      .post(`${environment.Url}/api/v1/dashboard/product`, productData)
       .subscribe(
-        (data) => {
-        },
-        (error) => {
-        }
+        (data) => {},
+        (error) => {}
       );
     if (productData.status === 'Available') productData.status = 1;
     else productData.status = 0;
@@ -504,6 +512,7 @@ export class InventoryComponent implements OnInit {
       this.toastr.success('Data Successfully Updated', 'Success');
     }
   }
+
   isDropdownOpen = false;
   selectedFilters: { [key: string]: boolean } = {};
   searchText?: string = '';

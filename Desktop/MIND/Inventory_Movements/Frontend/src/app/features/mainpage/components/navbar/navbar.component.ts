@@ -29,6 +29,7 @@ export class NavbarComponent implements OnInit {
   getUserInfo(): void {
     this.main.getUserInfo().subscribe({
       next: (data) => {
+        console.log(data);
         this.user = data;
       },
       error: (error) => {

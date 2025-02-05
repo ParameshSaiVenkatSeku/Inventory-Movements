@@ -33,11 +33,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
     let clonedRequest = request;
 
-    if (
-      access_token &&
-      !request.url.includes('/api') &&
-      !request.url.includes('/akv-interns')
-    ) {
+    if (access_token && !request.url.includes('/akv-interns')) {
       clonedRequest = request.clone({
         setHeaders: {
           Authorization: `Bearer ${access_token}`,
@@ -51,13 +47,20 @@ export class AuthInterceptor implements HttpInterceptor {
           // console.log('came inside 1');
           if (!this.refreshingToken) {
             this.refreshingToken = true;
+            // console.log(this.refreshingToken);
             // console.log('came inside 2');
             this.refreshTokenSubject = this.authService.refreshToken().pipe(
               switchMap((newToken: any) => {
-                // console.log('came inside 3');
+                // console.log('came inside 3', newToken);
                 this.authService.setToken(newToken.access_token);
                 this.authService.setRefreshToken(newToken.refresh_token);
-                return of(newToken.access_token);
+                const retryRequest = request.clone({
+                  headers: request.headers.set(
+                    'Authorization',
+                    `Bearer ${newToken.access_token}`
+                  ),
+                });
+                return next.handle(retryRequest);
               })
             );
           }
@@ -68,10 +71,7 @@ export class AuthInterceptor implements HttpInterceptor {
               switchMap((newAccessToken: string) => {
                 // console.log('new', newAccessToken);
 
-                if (
-                  !request.url.includes('/api') &&
-                  !request.url.includes('/akv-interns')
-                ) {
+                if (!request.url.includes('/akv-interns')) {
                   const updatedRequest = request.clone({
                     setHeaders: {
                       Authorization: `Bearer ${newAccessToken}`,

@@ -46,7 +46,7 @@ export class ProductFormComponent implements OnInit {
   categories: any;
   ngOnInit(): void {
     this.http
-      .get(`${environment.Url}/dashboard/vendor`)
+      .get(`${environment.Url}/api/v1/dashboard/vendor`)
       .subscribe((data: any) => {
         this.vendors = data;
         if (this.item) {
@@ -55,7 +55,7 @@ export class ProductFormComponent implements OnInit {
       });
 
     this.http
-      .get(`${environment.Url}/dashboard/categories`)
+      .get(`${environment.Url}/api/v1/dashboard/categories`)
       .subscribe((data: any) => {
         this.categories = data;
         if (this.item && this.vendors) {
@@ -123,7 +123,7 @@ export class ProductFormComponent implements OnInit {
       this.aws.uploadFileToS3(presignedUrl, this.selectedFile).subscribe({
         next: () => {
           this.http
-            .put(`${environment.Url}/dashboard/product/updateImage`, {
+            .put(`${environment.Url}/api/v1/dashboard/product/updateImage`, {
               id: this.item?.product_id,
               image: image,
             })

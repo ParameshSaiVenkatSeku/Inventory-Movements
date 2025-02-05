@@ -98,7 +98,7 @@ export class CartComponent implements OnInit {
         };
 
         await this.http
-          .post(`${environment.Url}/dashboard/move-to-cart`, payload)
+          .post(`${environment.Url}/api/v1/dashboard/move-to-cart`, payload)
           .subscribe(
             (response: any) => {
               // console.log('Product moved to cart:', response);

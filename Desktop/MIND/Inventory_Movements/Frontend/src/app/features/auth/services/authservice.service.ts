@@ -40,7 +40,7 @@ export class AuthserviceService {
     };
 
     return this.http
-      .post(`${this.apiUrl}/auth/signup`, body)
+      .post(`${this.apiUrl}/api/v1/auth/signup`, body)
       .pipe(catchError(this.handleError));
   }
 
@@ -59,15 +59,15 @@ export class AuthserviceService {
       email: encryptedEmail,
       password: encryptedPassword,
     };
-
+    console.log(email, password, body);
     return this.http
-      .post(`${this.apiUrl}/auth/login`, body)
+      .post(`${this.apiUrl}/api/v1/auth/login`, body)
       .pipe(catchError(this.handleError));
   }
 
   getAllUsers(): Observable<any> {
     return this.http
-      .get(`${this.apiUrl}/user/getAll`)
+      .get(`${this.apiUrl}/api/v1/user/getAll`)
       .pipe(catchError(this.handleError));
   }
 
@@ -92,6 +92,7 @@ export class AuthserviceService {
 
   getToken(): any {
     if (this.isBrowser()) {
+      // console.log(sessionStorage.getItem('access_token'));
       return sessionStorage.getItem('access_token');
     }
     return null;
@@ -100,7 +101,9 @@ export class AuthserviceService {
   refreshToken(): Observable<any> {
     const refreshToken = sessionStorage.getItem('refresh_token');
     return this.http
-      .post<any>(`${this.apiUrl}/auth/refresh`, { refresh_token: refreshToken })
+      .post<any>(`${this.apiUrl}/api/v1/auth/refresh`, {
+        refresh_token: refreshToken,
+      })
       .pipe(
         tap((response) => {
           sessionStorage.setItem('access_token', response.access_token);
@@ -129,7 +132,9 @@ export class AuthserviceService {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
-    return this.http.get<any>(`${this.apiUrl}/user/userdata`, { headers });
+    return this.http.get<any>(`${this.apiUrl}/api/v1/user/userdata`, {
+      headers,
+    });
   }
 
   private handleError(error: any): Observable<any> {

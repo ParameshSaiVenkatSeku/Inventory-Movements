@@ -24,7 +24,7 @@ export class DashGuard implements CanActivate {
     | UrlTree {
     const isAuthenticated = sessionStorage.getItem('authToken');
     if (!isAuthenticated) {
-      return this.router.navigate(['/auth/login']);
+      return this.router.navigate(['api/v1/auth/login']);
     }
     return this.router.navigate(['/dashboard']);
   }

@@ -63,7 +63,7 @@ export class ImportFileComponent implements OnInit, OnDestroy {
     const offset = (this.pageNo - 1) * this.limit;
     return this.http
       .get<FileUploadResponse>(
-        `${environment.Url}/imports/getData/${userId.user_id}?limit=${this.limit}&offset=${offset}`
+        `${environment.Url}/api/v1/imports/getData/${userId.user_id}?limit=${this.limit}&offset=${offset}`
       )
       .pipe(
         map((response: any) => ({

@@ -32,10 +32,7 @@ export class MainpageService {
 
   getUserInfo(): Observable<any> {
     const token = this.authSer.getToken();
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
-    return this.http.get<any>(`${this.apiUrl}/user/userdata`);
+    return this.http.get<any>(`${this.apiUrl}/api/v1/user/userdata`);
   }
 
   getPresignedUrl(
@@ -47,7 +44,7 @@ export class MainpageService {
       presignedUrl: string;
       fileName: string;
       userId: string;
-    }>(`${environment.Url}/api/get-presigned-url`, {
+    }>(`${environment.Url}/api/v1/aws/get-presigned-url`, {
       fileName,
       fileType,
       userId,
@@ -64,7 +61,7 @@ export class MainpageService {
     fileName: string,
     presignedUrl: string
   ): Observable<any> {
-    return this.http.post(`${environment.Url}/api/update-profile-pic`, {
+    return this.http.post(`${environment.Url}/api/v1/aws/update-profile-pic`, {
       userId,
       fileName,
       presignedUrl,
@@ -74,7 +71,7 @@ export class MainpageService {
   getFiles(): Observable<any[]> {
     const negation_value = -1;
     return this.http.get<any[]>(
-      `${environment.Url}/api/getfiles/${negation_value}`
+      `${environment.Url}/api/v1/aws/getfiles/${negation_value}`
     );
   }
 
@@ -90,7 +87,7 @@ export class MainpageService {
 
   editproduct(edit: any) {
     // console.log(edit);
-    return this.http.post(`${environment.Url}/dashboard/product`, edit);
+    return this.http.post(`${environment.Url}/api/v1/dashboard/product`, edit);
   }
 
   setdata(item: any) {
@@ -117,7 +114,7 @@ export class MainpageService {
       .set('page', pageno.toString())
       .set('searchText', searchText)
       .set('filters', JSON.stringify(store));
-    return this.http.get(`${environment.Url}/dashboard/filterProduct`, {
+    return this.http.get(`${environment.Url}/api/v1/dashboard/filterProduct`, {
       params,
     });
   }
@@ -136,7 +133,7 @@ export class MainpageService {
 
   addproducts(productData: any) {
     return this.http
-      .post(`${environment.Url}/dashboard/product`, productData)
+      .post(`${environment.Url}/api/v1/dashboard/product`, productData)
       .subscribe(
         (data) => {
           this.toastr.success('Product Added Successfully', 'Success');

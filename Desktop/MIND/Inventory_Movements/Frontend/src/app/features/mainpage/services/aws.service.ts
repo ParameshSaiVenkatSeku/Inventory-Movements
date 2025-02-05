@@ -17,7 +17,7 @@ export class AwsService {
       presignedUrl: string;
       fileName: string;
       userId: string;
-    }>(`${environment.Url}/api/get-presigned-url`, {
+    }>(`${environment.Url}/api/v1/aws/get-presigned-url`, {
       fileName,
       fileType,
       userId,
@@ -34,7 +34,7 @@ export class AwsService {
     fileName: string,
     presignedUrl: string
   ): Observable<any> {
-    return this.http.post(`${environment.Url}/api/update-profile-pic`, {
+    return this.http.post(`${environment.Url}/api/v1/aws/update-profile-pic`, {
       userId,
       fileName,
       presignedUrl,
@@ -42,7 +42,7 @@ export class AwsService {
   }
 
   getFiles(): Observable<any[]> {
-    return this.http.get<any[]>(`${environment.Url}/api/getfiles`);
+    return this.http.get<any[]>(`${environment.Url}/api/v1/aws/getfiles`);
   }
 
   downloadSelectedFiles(selectedFiles: string[]): Observable<Blob> {

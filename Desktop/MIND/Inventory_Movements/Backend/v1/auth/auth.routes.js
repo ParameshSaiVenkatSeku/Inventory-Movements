@@ -2,6 +2,7 @@ const express = require("express");
 const { CreateUser, loginUser, RefreshToken } = require("./auth.controller");
 const router = express.Router();
 const authenticateToken = require("../../middlewares/authenticateToken");
+const encryptionMiddleware = require("../../middlewares/encryptionMiddleware");
 
 /**
  * @swagger
@@ -36,7 +37,7 @@ const authenticateToken = require("../../middlewares/authenticateToken");
  *       400:
  *         description: Bad request.
  */
-router.post("/signup", CreateUser);
+router.post("/signup", encryptionMiddleware, CreateUser);
 
 /**
  * @swagger
@@ -69,8 +70,7 @@ router.post("/signup", CreateUser);
  *       401:
  *         description: Unauthorized.
  */
-router.post("/login", loginUser);
-
+router.post("/login", encryptionMiddleware, loginUser);
 /**
  * @swagger
  * /auth/refresh:
@@ -92,6 +92,6 @@ router.post("/login", loginUser);
  *       403:
  *         description: Forbidden.
  */
-router.post("/refresh", authenticateToken, RefreshToken);
+router.post("/refresh", RefreshToken);
 
 module.exports = router;
