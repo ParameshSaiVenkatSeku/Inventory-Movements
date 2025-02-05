@@ -86,7 +86,7 @@ const profileUpdate = async (req, res) => {
   const fileUrl = `${process.env.PROFILE_PICTURE_URL}${fileName}`;
   try {
     await db("users").where("user_id", userId).update({ profile_pic: fileUrl });
-    console.log("[profileUpdate] Profile updated for user:", userId);
+    console.log("[profileUpdate] Profile updated for user:", userId, fileUrl);
     res.json({ message: "Profile picture updated successfully", fileUrl });
   } catch (err) {
     console.error("[profileUpdate] Error updating profile picture:", err);

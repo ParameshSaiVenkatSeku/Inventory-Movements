@@ -4,9 +4,10 @@ const jwt = require("jsonwebtoken");
 const { Model } = require("objection");
 const knexConfig = require("./../../knexfile");
 const { signupUserSchema, loginUserSchema } = require("./auth.utils");
+const { getUserByEmail } = require("./auth.queries");
 const asyncErrorHandler = require("../../utils/asyncErrorHandler");
 const CustomError = require("../../utils/CustomError");
-
+const nodemailer = require("nodemailer");
 const db = knex(knexConfig);
 Model.knex(db);
 
@@ -37,7 +38,7 @@ function generateRefreshToken(user) {
   );
 }
 
-const CreateUser = asyncErrorHandler(async (req, res) => {
+const createUser = asyncErrorHandler(async (req, res) => {
   const { first_name, last_name, email, password } = req.body;
   const { error } = signupUserSchema.validate(req.body);
   if (error) {
@@ -61,7 +62,6 @@ const CreateUser = asyncErrorHandler(async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, 10);
   const [user_id] = await db("users").insert({
     first_name,
-    last_name,
     username,
     password: hashedPassword,
     email,
@@ -106,7 +106,7 @@ const loginUser = asyncErrorHandler(async (req, res) => {
   });
 });
 
-const RefreshToken = asyncErrorHandler(async (req, res) => {
+const refreshToken = asyncErrorHandler(async (req, res) => {
   const { refresh_token } = req.body;
   if (!refresh_token) {
     return res.status(401).json({ message: "Refresh token is required" });
@@ -128,4 +128,70 @@ const RefreshToken = asyncErrorHandler(async (req, res) => {
   });
 });
 
-module.exports = { CreateUser, loginUser, RefreshToken };
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
+
+const forgotEmail = async (req, res, next) => {
+  try {
+    const email = req.params.email;
+    // console.log(req.params);
+    // console.log(email);
+    const user = await getUserByEmail(email);
+    // console.log(user);
+    if (!user || user === undefined) {
+      return res.status(400).send({ message: "User Not Found" });
+    }
+    console.log(user);
+    const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "15m",
+    });
+    console.log(`${process.env.URL}`);
+    const resetLink = `${process.env.URL}/auth/reset?token=${token}`;
+    console.log("hello");
+    await transporter.sendMail({
+      from: process.env.SMTP_USER,
+      to: email,
+      subject: "Password Reset",
+      html: `<p>Click <a href="${resetLink}">here</a> to reset your password.</p>`,
+    });
+    return res.status(200).send({ message: "Email Sent Successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: "Error Occured in sending the request" });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    console.log(req.body);
+    const { password, token } = req.body;
+    console.log("toek", token);
+    console.log("hello yeswanth");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    console.log(decoded, "decodes");
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log("dhojhd", hashedPassword);
+    await db("users")
+      .where({ user_id: decoded.id })
+      .update({ password: hashedPassword });
+
+    res.json({ message: "Password reset successful" });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ message: "Invalid or expired token" });
+  }
+};
+
+module.exports = {
+  createUser,
+  loginUser,
+  refreshToken,
+  forgotEmail,
+  resetPassword,
+};

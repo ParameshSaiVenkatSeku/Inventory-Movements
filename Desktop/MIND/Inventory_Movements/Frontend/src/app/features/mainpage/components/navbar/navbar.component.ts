@@ -53,6 +53,7 @@ export class NavbarComponent implements OnInit {
     if (this.selectedFile) {
       const fileName = this.selectedFile.name;
       const fileType = this.selectedFile.type;
+      console.log(fileName, fileType);
       this.main
         .getPresignedUrl(fileName, fileType, this.user.user_id)
         .subscribe({
@@ -80,6 +81,11 @@ export class NavbarComponent implements OnInit {
                 this.router
                   .navigateByUrl('/dashboard', { skipLocationChange: true })
                   .then(() => {
+                    this.router.navigate([decodeURIComponent(this.router.url)]);
+                  });
+                this.router
+                  .navigateByUrl('/dashboard', { skipLocationChange: true })
+                  .catch(() => {
                     this.router.navigate([decodeURIComponent(this.router.url)]);
                   });
               },

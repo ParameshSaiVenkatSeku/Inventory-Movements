@@ -1,4 +1,3 @@
-// import.queries.js
 const knex = require("knex");
 const knexConfig = require("../../knexfile");
 const db = knex(knexConfig);
@@ -97,7 +96,7 @@ const insertProductWithVendors = async (record, trx = db) => {
         : "1",
   };
   const productId = await insertProduct(productData, trx);
-  console.log("import queries - 99", productId);
+  // console.log("import queries - 99", productId);
   for (const vendorName of record.vendors) {
     const vendor = await getVendorByName(vendorName);
     if (!vendor) throw new Error("Invalid vendor");

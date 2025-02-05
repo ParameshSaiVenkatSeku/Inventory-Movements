@@ -1,42 +1,40 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: 'app-reset',
-  templateUrl: './reset.component.html',
-  styleUrls: ['./reset.component.css'],
+  selector: 'app-forgot',
+  templateUrl: './forgot.component.html',
+  styleUrls: ['./forgot.component.css'],
 })
-export class ResetComponent {
-  resetForm: FormGroup;
-  token!: any;
+export class ForgotComponent {
+  forgotForm: FormGroup;
+
   constructor(
     private http: HttpClient,
     private toastr: ToastrService,
-    private router: Router,
-    private route: ActivatedRoute
+    private router: Router
   ) {
-    this.resetForm = new FormGroup({
-      password: new FormControl('', [Validators.required]),
+    this.forgotForm = new FormGroup({
+      email: new FormControl('', [Validators.required, Validators.email]),
     });
   }
 
   onSubmit(): void {
-    if (this.resetForm.invalid) {
-      console.log('Invalid form:', this.resetForm.errors);
+    if (this.forgotForm.invalid) {
+      console.log('Invalid form:', this.forgotForm.errors);
       return;
     }
 
-    console.log('Submitting:', this.resetForm.value);
-    this.token = this.route.snapshot.queryParamMap.get('token') || null;
+    console.log('Submitting:', this.forgotForm.value);
+
     this.http
-      .post(`${environment.Url}/api/v1/auth/resetPassword`, {
-        password: this.resetForm.value.password,
-        token: this.token,
-      })
+      .get(
+        `${environment.Url}/api/v1/auth/forgotEmail/${this.forgotForm.value.email}`
+      )
       .subscribe({
         next: (response) => {
           // console.log('Success:', response);

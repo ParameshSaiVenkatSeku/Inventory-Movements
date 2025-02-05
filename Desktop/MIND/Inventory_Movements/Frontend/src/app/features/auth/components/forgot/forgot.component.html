@@ -1,33 +1,33 @@
 <div class="container vh-100 d-flex align-items-center justify-content-center">
   <div class="row w-100">
     <div class="col-md-6 d-flex flex-column justify-content-center p-5">
-      <h1 class="mb-3" style="color: purple">Reset Password</h1>
+      <h1 class="mb-3" style="color: purple">Forgotten Password</h1>
       <p class="text-muted mb-4">
-        Enter your desired password to reset your credentials.
+        Enter your registered email to receive a reset link.
       </p>
 
-      <form [formGroup]="resetForm" (ngSubmit)="onSubmit()">
+      <form [formGroup]="forgotForm" (ngSubmit)="onSubmit()">
         <div class="mb-3">
-          <label for="password" class="form-label">New Password</label>
+          <label for="email" class="form-label">Registered Email</label>
           <input
-            type="password"
-            id="password"
+            type="email"
+            id="email"
             class="form-control"
-            formControlName="password"
-            placeholder="Enter your desired password"
+            formControlName="email"
+            placeholder="Enter your registered email"
           />
           <div
             *ngIf="
-              resetForm.get('password')?.invalid &&
-              resetForm.get('password')?.touched
+              forgotForm.get('email')?.invalid &&
+              forgotForm.get('email')?.touched
             "
             class="text-danger"
           >
-            <small *ngIf="resetForm.get('password')?.errors?.['required']">
-              Password is required.
+            <small *ngIf="forgotForm.get('email')?.errors?.['required']">
+              Email is required.
             </small>
-            <small *ngIf="resetForm.get('password')?.errors?.['password']">
-              Please enter a valid password.
+            <small *ngIf="forgotForm.get('email')?.errors?.['email']">
+              Please enter a valid email.
             </small>
           </div>
         </div>
@@ -36,9 +36,9 @@
           type="submit"
           class="btn w-100 cursor-pointer"
           style="color: wheat; background-color: purple"
-          [disabled]="resetForm.invalid"
+          [disabled]="forgotForm.invalid"
         >
-          Reset
+          Send Link
         </button>
       </form>
 

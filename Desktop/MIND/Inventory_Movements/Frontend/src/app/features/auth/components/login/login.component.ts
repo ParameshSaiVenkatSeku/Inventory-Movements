@@ -37,7 +37,7 @@ export class LoginComponent implements OnInit {
           if (response && response.access_token) {
             this.authService.setToken(response.access_token);
             this.authService.setRefreshToken(response.refresh_token);
-            const decodedToken: any = jwt_decode(response.access_token);
+            // const decodedToken: any = jwt_decode(response.access_token);
             this.toastr.success('Logged in successfully!', 'Success');
             this.loginForm.reset();
             this.router.navigate(['/dashboard']);

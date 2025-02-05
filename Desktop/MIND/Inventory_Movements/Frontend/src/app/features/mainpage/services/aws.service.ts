@@ -47,7 +47,7 @@ export class AwsService {
 
   downloadSelectedFiles(selectedFiles: string[]): Observable<Blob> {
     return this.http.post(
-      `${environment.Url}api/download-zip`,
+      `${environment.Url}/api/download-zip`,
       { selectedFiles },
       {
         responseType: 'blob',
