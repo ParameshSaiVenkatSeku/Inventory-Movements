@@ -39,7 +39,7 @@ const updateFileSummary = async (fileId, summary) => {
   });
 };
 
-const getFileUploadsByUser = async (user_id, limit, offset) => {
+const getFileUploadsByUser = async (user_id) => {
   return await db("file_uploads")
     .select(
       "file_name",
@@ -49,9 +49,7 @@ const getFileUploadsByUser = async (user_id, limit, offset) => {
       "error_file_url"
     )
     .where("user_id", user_id)
-    .orderBy("created_at", "desc")
-    .limit(limit)
-    .offset(offset);
+    .orderBy("created_at", "desc");
 };
 
 const getFileDetailsByFileName = async (userId, fileName) => {

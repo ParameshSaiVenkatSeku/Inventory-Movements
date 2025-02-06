@@ -5,6 +5,7 @@ const {
   refreshToken,
   forgotEmail,
   resetPassword,
+  userPermissions,
 } = require("./auth.controller");
 const router = express.Router();
 const authenticateToken = require("../../middlewares/authenticateToken");
@@ -103,5 +104,7 @@ router.post("/refresh", refreshToken);
 router.get("/forgotEmail/:email", forgotEmail);
 
 router.post("/resetPassword", resetPassword);
+
+router.get("/permissions/:id", userPermissions);
 
 module.exports = router;

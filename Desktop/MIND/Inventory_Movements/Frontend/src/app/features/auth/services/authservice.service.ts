@@ -21,7 +21,8 @@ export class AuthserviceService {
     firstName: string,
     lastName: string,
     email: string,
-    password: string
+    password: string,
+    branchName: string
   ): Observable<any> {
     const encryptedEmail = CryptoJS.AES.encrypt(
       email,
@@ -37,6 +38,7 @@ export class AuthserviceService {
       last_name: lastName,
       email: encryptedEmail,
       password: encryptedPassword,
+      branch: branchName,
     };
 
     return this.http

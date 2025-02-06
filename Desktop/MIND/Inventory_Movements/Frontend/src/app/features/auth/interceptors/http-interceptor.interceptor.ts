@@ -8,7 +8,6 @@ import {
 import {
   catchError,
   Observable,
-  of,
   switchMap,
   take,
   throwError,

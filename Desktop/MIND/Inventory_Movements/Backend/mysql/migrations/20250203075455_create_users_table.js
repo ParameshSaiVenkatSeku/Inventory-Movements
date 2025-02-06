@@ -7,8 +7,17 @@ exports.up = function (knex) {
     table.string("email").notNullable().unique();
     table.string("profile_pic").nullable();
     table.string("thumbnail");
+    table.string("branch").nullable();
     table.enum("status", ["0", "1", "2", "99"]).defaultTo("0");
     table.timestamps(true, true);
+    table
+      .integer("role_id")
+      .unsigned()
+      .notNullable()
+      .references("id")
+      .inTable("roles")
+      .onDelete("CASCADE")
+      .defaultTo(3);
     table.index(["email", "password"]);
   });
 };

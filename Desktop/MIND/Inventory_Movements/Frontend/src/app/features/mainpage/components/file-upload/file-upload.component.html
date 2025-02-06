@@ -3,6 +3,7 @@
     <h5 class="mb-2">File Uploads</h5>
     <div class="d-flex gap-2">
       <button
+        *ngIf="hasPermission('file_download')"
         class="teal-button btn border-secondary"
         (click)="downloadAllSelected()"
       >
@@ -10,6 +11,7 @@
         Download all
       </button>
       <button
+        *ngIf="hasPermission('file_upload')"
         class="btn d-flex align-items-center purple-button gap-2"
         data-bs-toggle="modal"
         data-bs-target="#uploadModal12"

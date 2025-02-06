@@ -59,7 +59,7 @@ dashboard.get("/categories", categories);
  *       401:
  *         description: Unauthorized.
  */
-dashboard.get("/cartData", authenticateToken, getCartData);
+dashboard.get("/cartData/:id", authenticateToken, getCartData);
 
 /**
  * @swagger
@@ -150,7 +150,7 @@ dashboard.delete("/product/:productId", deleteProduct);
  *       200:
  *         description: Products retrieved successfully.
  */
-dashboard.get("/filterProduct", getAllProducts);
+dashboard.get("/filterProduct/:id", getAllProducts);
 
 /**
  * @swagger

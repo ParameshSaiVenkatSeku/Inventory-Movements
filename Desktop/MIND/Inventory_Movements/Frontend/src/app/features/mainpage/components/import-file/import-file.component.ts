@@ -27,9 +27,6 @@ export interface FileUploadResponse {
 export class ImportFileComponent implements OnInit, OnDestroy {
   fileReports: FileUpload[] = [];
   pollingSubscription!: Subscription;
-  pageNo = 1;
-  limit = 5;
-  hasMore = false;
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
@@ -52,7 +49,6 @@ export class ImportFileComponent implements OnInit, OnDestroy {
   loadPage(): void {
     this.fetchFileUploads().subscribe((response: FileUploadResponse) => {
       this.fileReports = response.data || [];
-      this.hasMore = response.data.length === this.limit;
     });
   }
 
@@ -60,10 +56,9 @@ export class ImportFileComponent implements OnInit, OnDestroy {
     const token = sessionStorage.getItem('access_token');
     if (!token) return new Observable<FileUploadResponse>();
     const userId = JSON.parse(atob(token.split('.')[1]));
-    const offset = (this.pageNo - 1) * this.limit;
     return this.http
       .get<FileUploadResponse>(
-        `${environment.Url}/api/v1/imports/getData/${userId.user_id}?limit=${this.limit}&offset=${offset}`
+        `${environment.Url}/api/v1/imports/getData/${userId.user_id}`
       )
       .pipe(
         map((response: any) => ({
@@ -109,19 +104,5 @@ export class ImportFileComponent implements OnInit, OnDestroy {
         return excelData;
       })
     );
-  }
-
-  nextPage(): void {
-    if (this.hasMore) {
-      this.pageNo++;
-      this.loadPage();
-    }
-  }
-
-  prevPage(): void {
-    if (this.pageNo > 1) {
-      this.pageNo--;
-      this.loadPage();
-    }
   }
 }

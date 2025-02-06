@@ -47,17 +47,12 @@ const fileUploadToTable = async (req, res) => {
 
 const getDataFromTable = async (req, res) => {
   try {
-    const page = parseInt(req.query.page, 10) || 1;
-    const limit = parseInt(req.query.limit, 10) || 5;
-    const offset = (page - 1) * limit;
-
     const userId = req.params.id;
-    const data = await getFileUploadsByUser(userId, limit, offset);
+    const data = await getFileUploadsByUser(userId);
 
     res.status(200).json({
       message: "Data retrieved successfully",
       data: data,
-      pagination: { page, limit, offset },
     });
   } catch (error) {
     console.error("Error fetching data:", error);

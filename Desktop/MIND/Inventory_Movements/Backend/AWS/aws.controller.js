@@ -114,7 +114,7 @@ const getFiles = async (req, res) => {
         fileType: __filename.split(".").pop(),
       };
     });
-    console.log("[getFiles] Files retrieved successfully.");
+    // console.log("[getFiles] Files retrieved successfully.");
     res.json(files);
   });
 };

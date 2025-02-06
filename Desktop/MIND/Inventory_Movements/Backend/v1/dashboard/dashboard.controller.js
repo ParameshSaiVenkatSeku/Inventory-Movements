@@ -100,6 +100,7 @@ const deleteProduct = async (req, res) => {
 
 const getAllProducts = async (req, res, next) => {
   try {
+    const userId = req.params.id;
     const {
       product_name,
       category_name,
@@ -291,6 +292,7 @@ const moveToCart = async (req, res) => {
 };
 
 const getCartData = async (req, res) => {
+  const userId = req.params.id;
   try {
     const cartItems = await db("product_carts").select(
       "product_id",

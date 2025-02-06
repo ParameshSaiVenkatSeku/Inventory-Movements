@@ -13,6 +13,7 @@ import { CartComponent } from './components/cart/cart.component';
 import { ImportFileComponent } from './components/import-file/import-file.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { GroupChatComponent } from './components/group-chat/group-chat.component';
+import { UserComponent } from './components/user/user.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { GroupChatComponent } from './components/group-chat/group-chat.component
     ImportFileComponent,
     ChatComponent,
     GroupChatComponent,
+    UserComponent,
   ],
   imports: [
     CommonModule,

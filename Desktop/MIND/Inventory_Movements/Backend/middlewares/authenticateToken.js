@@ -7,7 +7,6 @@ Model.knex(db);
 const JWT_SECRET = "AkriviaHCM";
 
 const authenticateToken = (req, res, next) => {
-  // console.log("Authenticating");
   const token = req.headers["authorization"]?.split(" ")[1];
 
   if (!token) {
@@ -29,7 +28,7 @@ const authenticateToken = (req, res, next) => {
       username: user1.username,
       email: user1.email,
     };
-    // console.log("I'm authenticated");
+
     next();
   });
 };

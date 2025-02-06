@@ -1,0 +1,184 @@
+<div class="table-responsive">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th class="text-center">Role</th>
+        <th class="text-center">Region</th>
+        <th class="text-center">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.username }}</td>
+        <td class="text-center">{{ user.role }}</td>
+        <td class="text-center">{{ user.region }}</td>
+        <td class="text-center">
+          <button
+            class="btn btn-light btn-sm me-1"
+            (click)="viewUser(user)"
+            data-bs-toggle="modal"
+            data-bs-target="#viewUserModal"
+          >
+            <i class="bi bi-eye"></i>
+          </button>
+          <button
+            class="btn btn-light btn-sm me-1"
+            (click)="confirmDelete(user)"
+            data-bs-toggle="modal"
+            data-bs-target="#deleteUserModal"
+          >
+            <i class="bi bi-trash"></i>
+          </button>
+          <button
+            class="btn btn-light btn-sm"
+            (click)="updateUser(user)"
+            data-bs-toggle="modal"
+            data-bs-target="#updateUserModal"
+          >
+            <i class="bi bi-pencil"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- View User Modal -->
+<div class="modal fade" id="viewUserModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">User Details</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>First Name:</strong> {{ selectedUser?.first_name }}</p>
+        <p><strong>Username:</strong> {{ selectedUser?.username }}</p>
+        <p><strong>Email:</strong> {{ selectedUser?.email }}</p>
+        <p><strong>Role:</strong> {{ selectedUser?.role }}</p>
+        <p><strong>Region:</strong> {{ selectedUser?.region }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Update User Modal -->
+<div class="modal fade" id="updateUserModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Update User</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="firstName" class="form-label">First Name</label>
+          <input
+            type="text"
+            id="firstName"
+            [(ngModel)]="updatedUser.first_name"
+            class="form-control"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input
+            type="text"
+            id="username"
+            [(ngModel)]="updatedUser.username"
+            class="form-control"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input
+            type="email"
+            id="email"
+            [(ngModel)]="updatedUser.email"
+            class="form-control"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="role" class="form-label">Role</label>
+          <input
+            type="text"
+            id="role"
+            [(ngModel)]="updatedUser.role"
+            class="form-control"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="region" class="form-label">Region</label>
+          <input
+            type="text"
+            id="region"
+            [(ngModel)]="updatedUser.region"
+            class="form-control"
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-success"
+          (click)="saveUpdatedUser()"
+          data-bs-dismiss="modal"
+        >
+          Save
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Delete</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Are you sure you want to delete
+          <strong>{{ userToDelete?.username }}</strong
+          >?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="deleteUser()"
+          data-bs-dismiss="modal"
+        >
+          Delete
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

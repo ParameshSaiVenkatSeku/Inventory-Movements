@@ -23,6 +23,7 @@ export class FileUploadComponent implements OnInit {
   fileType: string | undefined;
   excelPreview: string | undefined;
   excelData: any[] = [];
+  permissions: any[] = [];
 
   constructor(
     private main: MainpageService,
@@ -232,5 +233,11 @@ export class FileUploadComponent implements OnInit {
         },
       });
     }
+  }
+
+  hasPermission(permission: string): boolean {
+    this.permissions = this.main.permissions;
+    // console.log(this.permissions);
+    return this.permissions.includes(permission);
   }
 }

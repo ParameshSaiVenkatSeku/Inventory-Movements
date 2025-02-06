@@ -28,10 +28,10 @@ interface cartData {
 })
 export class InventoryComponent implements OnInit {
   showUploads?: boolean;
-  onImport() {
-    this.showCart = false;
-    this.showUploads = true;
-  }
+  permissions: any[] = [];
+  showUsers?: boolean;
+  showView?: boolean = true;
+
   validColumns = [
     'product_name',
     'product_image',
@@ -254,26 +254,48 @@ export class InventoryComponent implements OnInit {
   }
 
   getCartData(): void {
-    this.http.get(`${environment.Url}/api/v1/dashboard/cartData`).subscribe(
-      (response: any) => {
-        this.cartItems = response.data;
-      },
-      (error) => {
-        console.error('Error fetching cart data:', error);
-      }
-    );
+    this.http
+      .get(
+        `${environment.Url}/api/v1/dashboard/cartData/${this.main.decodedToken.user_id}`
+      )
+      .subscribe(
+        (response: any) => {
+          this.cartItems = response.data;
+        },
+        (error) => {
+          console.error('Error fetching cart data:', error);
+        }
+      );
   }
 
   onCart() {
     this.showCart = true;
     this.filter = false;
     this.showUploads = false;
+    this.showView = false;
+    this.showUsers = false;
+  }
+
+  onImport() {
+    this.showCart = false;
+    this.showUploads = true;
+    this.showUsers = false;
+    this.showView = false;
+  }
+
+  onUsers() {
+    this.showCart = false;
+    this.showUploads = false;
+    this.showUsers = true;
+    this.showView = false;
   }
 
   onView() {
     this.showCart = false;
     this.filter = true;
     this.showUploads = false;
+    this.showUsers = false;
+    this.showView = true;
   }
 
   move() {
@@ -557,5 +579,11 @@ export class InventoryComponent implements OnInit {
   // Close modal if user clicks on the overlay (outside the modal content)
   onModalClick(event: Event): void {
     this.closeModal();
+  }
+
+  hasPermission(permission: string): boolean {
+    this.permissions = this.main.permissions;
+    // console.log(this.permissions);
+    return this.permissions.includes(permission);
   }
 }

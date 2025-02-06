@@ -39,7 +39,7 @@ function generateRefreshToken(user) {
 }
 
 const createUser = asyncErrorHandler(async (req, res) => {
-  const { first_name, last_name, email, password } = req.body;
+  const { first_name, last_name, email, password, branch } = req.body;
   const { error } = signupUserSchema.validate(req.body);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
@@ -65,6 +65,8 @@ const createUser = asyncErrorHandler(async (req, res) => {
     username,
     password: hashedPassword,
     email,
+    branch,
+    role_id: "3",
     status: "0",
   });
 
@@ -188,10 +190,28 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const userPermissions = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const permissions = await db("users")
+      .join("roles", "users.role_id", "roles.id")
+      .join("role_permissions", "roles.id", "role_permissions.role_id")
+      .join("permissions", "role_permissions.permission_id", "permissions.id")
+      .where("users.user_id", userId)
+      .select("permissions.permission_name");
+    // console.log(permissions);
+    res.status(200).json(permissions);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error);
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
   refreshToken,
   forgotEmail,
   resetPassword,
+  userPermissions,
 };

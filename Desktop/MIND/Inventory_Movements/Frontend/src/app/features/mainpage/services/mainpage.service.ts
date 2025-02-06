@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, map, Observable, Subject, take } from 'rxjs';
 import { AuthserviceService } from '../../auth/services/authservice.service';
 import { environment } from 'src/environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -20,10 +20,14 @@ export class MainpageService {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private toastr: ToastrService
-  ) {}
+  ) {
+    this.getUserPermissions();
+  }
 
   private sendToCartSubject = new BehaviorSubject<any[]>([]);
-
+  permissions: any[] = [];
+  private token = sessionStorage.getItem('access_token');
+  decodedToken = this.token ? JSON.parse(atob(this.token.split('.')[1])) : null;
   sendToCart$ = this.sendToCartSubject.asObservable();
 
   updateCart(data: any[]): void {
@@ -114,9 +118,12 @@ export class MainpageService {
       .set('page', pageno.toString())
       .set('searchText', searchText)
       .set('filters', JSON.stringify(store));
-    return this.http.get(`${environment.Url}/api/v1/dashboard/filterProduct`, {
-      params,
-    });
+    return this.http.get(
+      `${environment.Url}/api/v1/dashboard/filterProduct/${this.decodedToken.user_id}`,
+      {
+        params,
+      }
+    );
   }
 
   updateQueryparam(params: any) {
@@ -141,6 +148,27 @@ export class MainpageService {
         },
         (error) => {
           console.error('Error adding product:', error);
+        }
+      );
+  }
+
+  getUserPermissions(): void {
+    this.http
+      .get<any[]>(
+        `${environment.Url}/api/v1/auth/permissions/${this.decodedToken.user_id}`
+      )
+      .pipe(
+        take(1),
+        map((data) => data.map((perm) => perm.permission_name))
+      )
+      .subscribe(
+        (permissions) => {
+          console.log('User Permissions:', permissions);
+          this.permissions = permissions; // ✅ Store in a variable
+        },
+        (error) => {
+          console.error('Error fetching permissions:', error);
+          this.permissions = []; // Ensure array is always defined
         }
       );
   }

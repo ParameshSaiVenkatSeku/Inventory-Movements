@@ -1,0 +1,95 @@
+.card {
+  margin-top: 20px;
+  border-radius: 20px;
+  padding: 3%;
+}
+
+.card-header {
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+
+.progress-bar {
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Custom styling for the modal */
+.custom-modal {
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+}
+
+/* Modal header styling */
+.custom-modal .modal-header {
+  background-color: #f8f9fa;
+  border-bottom: none;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  padding: 16px;
+}
+
+/* Modal title */
+.custom-modal .modal-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* Input fields styling */
+.custom-modal .form-control {
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  transition: all 0.3s ease-in-out;
+}
+
+.custom-modal .form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0px 0px 6px rgba(0, 123, 255, 0.25);
+}
+
+/* Dropdown select styling */
+.custom-modal .form-select {
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  transition: all 0.3s ease-in-out;
+}
+
+.custom-modal .form-select:focus {
+  border-color: #007bff;
+  box-shadow: 0px 0px 6px rgba(0, 123, 255, 0.25);
+}
+
+/* Modal footer styling */
+.custom-modal .modal-footer {
+  background-color: #f8f9fa;
+  border-top: none;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  padding: 16px;
+}
+
+/* Save button styling */
+.custom-modal .btn-primary {
+  background-color: #007bff;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.3s ease-in-out;
+}
+
+.custom-modal .btn-primary:hover {
+  background-color: #0056b3;
+}
+
+/* Cancel button styling */
+.custom-modal .btn-secondary {
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 16px;
+  transition: all 0.3s ease-in-out;
+}

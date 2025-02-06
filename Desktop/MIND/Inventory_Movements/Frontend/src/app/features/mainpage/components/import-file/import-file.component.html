@@ -59,16 +59,3 @@
     </tbody>
   </table>
 </div>
-<div class="d-flex justify-content-between align-items-center mt-3">
-  <button
-    class="btn btn-primary"
-    (click)="prevPage()"
-    [disabled]="pageNo === 1"
-  >
-    Previous
-  </button>
-  <span>Page {{ pageNo }}</span>
-  <button class="btn btn-primary" (click)="nextPage()" [disabled]="!hasMore">
-    Next
-  </button>
-</div>

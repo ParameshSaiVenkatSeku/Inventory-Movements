@@ -5,7 +5,7 @@
         <h5 class="mb-0">Inventory Movements</h5>
         <small class="text-muted">{{ totalcount }} Products</small>
       </div>
-      <div *ngIf="!showCart && !showUploads">
+      <div *ngIf="showView">
         <button
           class="teal-button btn border me-2"
           (click)="move()"
@@ -28,6 +28,7 @@
         </button>
 
         <button
+          *ngIf="hasPermission('product_create')"
           class="btn purple-button border me-2"
           data-bs-toggle="modal"
           data-bs-target="#addProductModal"
@@ -42,7 +43,7 @@
           <button
             class="btn grey-button active border border-secondary"
             (click)="onView()"
-            [class.active]="!showCart"
+            [class.active]="showView"
           >
             <i class="bi bi-view-list"></i>
             View all
@@ -63,8 +64,17 @@
             <i class="bi bi-file-earmark-spreadsheet"></i>
             My Uploads
           </button>
+          <button
+            *ngIf="hasPermission('user_read')"
+            class="btn grey-button active border border-secondary"
+            (click)="onUsers()"
+            [class.active]="showUsers"
+          >
+            <i class="bi bi-user"></i>
+            Users
+          </button>
         </div>
-        <div class="d-flex gap-2" *ngIf="!showCart && !showUploads">
+        <div class="d-flex gap-2" *ngIf="showView">
           <div class="position-relative">
             <input
               type="text"
@@ -127,7 +137,7 @@
       </div>
     </div>
   </div>
-  <div class="card-body" *ngIf="!showCart && !showUploads">
+  <div class="card-body" *ngIf="showView">
     <div>
       <table class="table table-responsive table-hover">
         <thead>
@@ -186,6 +196,7 @@
                 <i class="bi bi-download"></i>
               </button>
               <button
+                *ngIf="hasPermission('product_delete')"
                 class="btn btn-light btn-sm me-1"
                 (click)="openDeleteModal(item?.product_id)"
                 data-bs-toggle="modal"
@@ -194,6 +205,7 @@
                 <i class="bi bi-trash"></i>
               </button>
               <button
+                *ngIf="hasPermission('product_update')"
                 class="btn btn-light btn-sm"
                 data-bs-toggle="modal"
                 data-bs-target="#editProductModal"
@@ -242,6 +254,10 @@
   <app-import-file></app-import-file>
 </div>
 
+<div class="card-body" *ngIf="showUsers">
+  <app-user></app-user>
+</div>
+
 <div class="card-body" *ngIf="showCart">
   <div>
     <table class="table table-responsive table-hover">
@@ -260,6 +276,7 @@
           <td>{{ item.quantity }}</td>
           <td>
             <button
+              *ngIf="hasPermission('cart_update')"
               class="btn btn-danger btn-sm"
               (click)="removeFromCart(item)"
             >
@@ -334,7 +351,6 @@
     </div>
   </div>
 </div>
-
 <div
   class="modal fade"
   id="addProductModal"

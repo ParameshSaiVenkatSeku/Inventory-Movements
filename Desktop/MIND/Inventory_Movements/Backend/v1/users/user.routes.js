@@ -38,7 +38,7 @@ const router = express.Router();
  *       401:
  *         description: Unauthorized access.
  */
-router.get("/userdata", authenticateToken, getUser);
+router.get("/userdata/", authenticateToken, getUser);
 
 /**
  * @swagger
@@ -105,58 +105,6 @@ router.put("/update/:id", authenticateToken, updateUser);
  *         description: Unauthorized access.
  */
 router.delete("/delete/:id", authenticateToken, deleteUser);
-
-/**
- * @swagger
- * /forgot-password:
- *   post:
- *     summary: Initiate forgot password process.
- *     description: Initiate the process to reset the user's password.
- *     tags: [User]
- *     requestBody:
- *       description: User email to receive the password reset link.
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *     responses:
- *       200:
- *         description: Password reset email sent.
- *       400:
- *         description: Invalid email address.
- */
-router.post("/forgot-password", forgotPassword);
-
-/**
- * @swagger
- * /reset-password:
- *   post:
- *     summary: Reset password.
- *     description: Reset the password using a token received from the forgot password process.
- *     tags: [User]
- *     requestBody:
- *       description: Token and new password for resetting.
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               token:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       200:
- *         description: Password successfully reset.
- *       400:
- *         description: Invalid token or password.
- */
-router.post("/reset-password", resetPassword);
 
 router.get("/getAllData", getAllUsers);
 

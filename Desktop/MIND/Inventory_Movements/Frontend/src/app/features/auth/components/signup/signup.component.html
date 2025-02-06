@@ -44,6 +44,25 @@
             <small>Last name is required.</small>
           </div>
         </div>
+        <div class="mb-3">
+          <label for="branchName" class="form-label">Branch*</label>
+          <input
+            type="text"
+            id="branchName"
+            class="form-control"
+            formControlName="branchName"
+            placeholder="Enter your Branch Name"
+          />
+          <div
+            *ngIf="
+              signupForm.get('branchName')?.invalid &&
+              signupForm.get('branchName')?.touched
+            "
+            class="text-danger"
+          >
+            <small>Branch Name is required.</small>
+          </div>
+        </div>
 
         <div class="mb-3">
           <label for="email" class="form-label">Email*</label>
