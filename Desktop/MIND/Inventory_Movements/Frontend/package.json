@@ -27,6 +27,7 @@
     "jwt-decode": "^3.1.2",
     "ngx-toastr": "^15.0.0",
     "rxjs": "~7.5.0",
+    "socket.io-client": "^4.8.1",
     "tslib": "^2.3.0",
     "webpack": "^5.68.0",
     "webpack-dev-middleware": "^5.3.4",

@@ -1,0 +1,26 @@
+<div class="chatbot-icon" (click)="toggleModal()">
+  <span>💬</span>
+</div>
+
+<div *ngIf="modal == true">
+  <div *ngIf="!showChat">
+    <h2>Create a Team</h2>
+    <button (click)="createTeam()">Create Team</button>
+
+    <h2>Join a Team</h2>
+    <input type="text" [(ngModel)]="teamId" placeholder="Enter Team Code" />
+    <button (click)="joinTeam()">Join</button>
+  </div>
+
+  <div *ngIf="showChat">
+    <h2>Team Chat ({{ teamId }})</h2>
+    <div *ngFor="let msg of messages">
+      <strong>{{ msg.sender }}:</strong> {{ msg.text }}
+    </div>
+
+    <input type="text" [(ngModel)]="message" placeholder="Type a message..." />
+    <button (click)="sendGroupMessage()">Send</button>
+  </div>
+  >
+</div>
+>

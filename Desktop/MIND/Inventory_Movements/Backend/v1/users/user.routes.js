@@ -3,6 +3,7 @@ const {
   getUser,
   updateUser,
   deleteUser,
+  getAllUsers,
   forgotPassword,
   resetPassword,
 } = require("./user.controller");
@@ -155,5 +156,7 @@ router.post("/forgot-password", forgotPassword);
  *         description: Invalid token or password.
  */
 router.post("/reset-password", resetPassword);
+
+router.get("/getAllData", getAllUsers);
 
 module.exports = router;

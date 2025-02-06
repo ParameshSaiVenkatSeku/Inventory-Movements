@@ -6,7 +6,7 @@ const {
 const cron = require("node-cron");
 
 cron.schedule("* * * * *", () => {
-  console.log("Cron is executing...");
+  // console.log("Cron is executing...");
   startValidation();
 });
 
@@ -21,7 +21,7 @@ const startValidation = async () => {
         );
       }
     } else {
-      console.log("No pending files to process.");
+      // console.log("No pending files to process.");
     }
   } catch (err) {
     console.error("Error during validation:", err);

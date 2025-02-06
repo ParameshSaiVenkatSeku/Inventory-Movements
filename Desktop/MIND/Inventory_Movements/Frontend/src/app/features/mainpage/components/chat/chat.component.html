@@ -1,0 +1,59 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="list-group">
+        <div
+          class="list-group-item d-flex align-items-center"
+          *ngFor="let user of users"
+          (click)="openChat(user)"
+        >
+          <img
+            [src]="user.profile_pic || 'favicon.ico'"
+            class="rounded-circle me-3"
+            width="50"
+            height="50"
+          />
+          <span class="fw-bold">{{ user.username }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="col-md-8 text-center d-flex align-items-center justify-content-center"
+      *ngIf="selectedUser === null"
+      style="color: #3498db"
+    >
+      Hey there! Let's start a conversation.
+    </div>
+
+    <div class="col-md-8" *ngIf="selectedUser">
+      <div class="chat-box">
+        <div class="chat-header">
+          <h5>{{ selectedUser.username }}</h5>
+        </div>
+        <div class="chat-body">
+          <div
+            *ngFor="let msg of messages"
+            [class.text-end]="msg.sender_id === currentUserId"
+          >
+            <p>{{ msg.message }}</p>
+          </div>
+        </div>
+        <div class="chat-footer">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Type a message"
+            #msgInput
+          />
+          <button
+            class="btn btn-primary"
+            (click)="sendMessage(msgInput.value); msgInput.value = ''"
+          >
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

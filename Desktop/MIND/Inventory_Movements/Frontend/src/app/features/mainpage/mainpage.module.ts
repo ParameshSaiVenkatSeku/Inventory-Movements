@@ -11,6 +11,8 @@ import { FormsModule } from '@angular/forms';
 import { FilterPipe } from './pipes/filter.pipe';
 import { CartComponent } from './components/cart/cart.component';
 import { ImportFileComponent } from './components/import-file/import-file.component';
+import { ChatComponent } from './components/chat/chat.component';
+import { GroupChatComponent } from './components/group-chat/group-chat.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +24,8 @@ import { ImportFileComponent } from './components/import-file/import-file.compon
     FilterPipe,
     CartComponent,
     ImportFileComponent,
+    ChatComponent,
+    GroupChatComponent,
   ],
   imports: [
     CommonModule,
