@@ -176,3 +176,90 @@
 .spinner-border {
   margin-top: 10px;
 }
+
+/* Chat Icon Styling */
+.chat-icon {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #3498db;
+  color: #fff;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-size: 24px;
+  z-index: 100;
+}
+
+/* Modal Overlay */
+.chat-modal {
+  position: fixed;
+  z-index: 101;
+  left: 0;
+  top: 0;
+  margin-top: 5%;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Modal Content Box */
+.chat-modal-content {
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 700px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Close Button */
+.close {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Chat Mode Buttons */
+.chat-modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.chat-modal-buttons button {
+  background-color: #3498db;
+  border: none;
+  padding: 10px 20px;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  outline: none;
+}
+
+.chat-modal-buttons button:hover {
+  background-color: #2980b9;
+}
+
+.active-btn {
+  background-color: #2980b9;
+}
+
+/* Chat Content Section */
+.chat-content {
+  border-top: 1px solid #ccc;
+  padding-top: 15px;
+}

@@ -529,4 +529,33 @@ export class InventoryComponent implements OnInit {
   handleModelChanges() {
     this.fetchData();
   }
+
+  modalOpen: boolean = false;
+  // activeChat can be either 'personal', 'group', or null (nothing selected)
+  activeChat: 'personal' | 'group' | null = null;
+
+  openModal(): void {
+    this.modalOpen = true;
+    this.activeChat = null;
+  }
+
+  // Close the modal
+  closeModal(): void {
+    this.modalOpen = false;
+  }
+
+  // Show the personal chat content
+  showPersonalChat(): void {
+    this.activeChat = 'personal';
+  }
+
+  // Show the group chat content
+  showGroupChat(): void {
+    this.activeChat = 'group';
+  }
+
+  // Close modal if user clicks on the overlay (outside the modal content)
+  onModalClick(event: Event): void {
+    this.closeModal();
+  }
 }

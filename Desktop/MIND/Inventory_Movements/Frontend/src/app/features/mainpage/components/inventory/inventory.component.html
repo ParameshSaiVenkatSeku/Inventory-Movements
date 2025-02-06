@@ -272,8 +272,44 @@
     </table>
   </div>
 </div>
-<app-chat></app-chat>
-<app-group-chat></app-group-chat>
+<!-- Chat Icon to open the Modal -->
+<div class="chat-icon" (click)="openModal()">💬</div>
+
+<!-- Chat Modal -->
+<div
+  class="chat-modal"
+  [ngStyle]="{ display: modalOpen ? 'block' : 'none' }"
+  (click)="onModalClick($event)"
+>
+  <div class="chat-modal-content" (click)="$event.stopPropagation()">
+    <span class="close" (click)="closeModal()">&times;</span>
+    <div class="chat-modal-buttons">
+      <button
+        [ngClass]="{ 'active-btn': activeChat === 'personal' }"
+        (click)="showPersonalChat()"
+      >
+        Personal Chat
+      </button>
+      <button
+        [ngClass]="{ 'active-btn': activeChat === 'group' }"
+        (click)="showGroupChat()"
+      >
+        Group Chat
+      </button>
+    </div>
+    <div class="chat-content">
+      <div *ngIf="activeChat === 'personal'">
+        <!-- Personal Chat Component renders here -->
+        <app-chat></app-chat>
+      </div>
+      <div *ngIf="activeChat === 'group'">
+        <!-- Group Chat Component renders here -->
+        <app-group-chat></app-group-chat>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div
   class="modal fade"
   id="moveToCartModal"

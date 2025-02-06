@@ -64,7 +64,11 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.http
       .get<User[]>(`${environment.Url}/api/v1/user/getAllData`)
       .subscribe(
-        (data) => (this.users = data),
+        (data) => {
+          this.users = data.filter(
+            (user) => user.user_id !== this.currentUserId
+          );
+        },
         (error) => console.error('Error fetching users:', error)
       );
   }

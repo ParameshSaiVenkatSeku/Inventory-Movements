@@ -98,6 +98,19 @@ const getAllUsers = async (req, res) => {
 const forgotPassword = async (req, res) => {};
 const resetPassword = async (req, res) => {};
 
+const chatHistory = async (req, res) => {
+  const sender = req.params.sendId,
+    receiver = req.params.recvId;
+  const messages = await db("messages")
+    .select("message")
+    .where("sender_id", sender)
+    .andWhere("receiver_id", receiver);
+
+  console.log(messages);
+
+  return messages;
+};
+
 module.exports = {
   getAllUsers,
   updateUser,
@@ -105,4 +118,5 @@ module.exports = {
   getUser,
   forgotPassword,
   resetPassword,
+  chatHistory,
 };

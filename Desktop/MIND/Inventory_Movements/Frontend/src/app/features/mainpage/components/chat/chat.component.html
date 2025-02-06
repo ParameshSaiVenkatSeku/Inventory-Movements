@@ -1,15 +1,17 @@
-<div class="container mt-4">
+<div class="container personal-chat-container">
   <div class="row">
-    <div class="col-md-4">
+    <!-- User List -->
+    <div class="col-md-4 user-list">
       <div class="list-group">
         <div
-          class="list-group-item d-flex align-items-center"
+          class="list-group-item user-item d-flex align-items-center"
           *ngFor="let user of users"
           (click)="openChat(user)"
         >
           <img
             [src]="user.profile_pic || 'favicon.ico'"
-            class="rounded-circle me-3"
+            alt="{{ user.username }}"
+            class="rounded-circle me-3 user-avatar"
             width="50"
             height="50"
           />
@@ -18,28 +20,31 @@
       </div>
     </div>
 
-    <div
-      class="col-md-8 text-center d-flex align-items-center justify-content-center"
-      *ngIf="selectedUser === null"
-      style="color: #3498db"
-    >
-      Hey there! Let's start a conversation.
-    </div>
+    <!-- Chat Section -->
+    <div class="col-md-8 chat-section">
+      <div
+        class="no-chat text-center d-flex align-items-center justify-content-center"
+        *ngIf="selectedUser === null"
+      >
+        Hey there! Let's start a conversation.
+      </div>
 
-    <div class="col-md-8" *ngIf="selectedUser">
-      <div class="chat-box">
+      <div class="chat-box" *ngIf="selectedUser">
         <div class="chat-header">
           <h5>{{ selectedUser.username }}</h5>
         </div>
         <div class="chat-body">
           <div
             *ngFor="let msg of messages"
-            [class.text-end]="msg.sender_id === currentUserId"
+            [ngClass]="{
+              sent: msg.sender_id === currentUserId,
+              received: msg.sender_id !== currentUserId
+            }"
           >
             <p>{{ msg.message }}</p>
           </div>
         </div>
-        <div class="chat-footer">
+        <div class="chat-footer d-flex">
           <input
             type="text"
             class="form-control"
@@ -47,7 +52,7 @@
             #msgInput
           />
           <button
-            class="btn btn-primary"
+            class="btn btn-primary ms-2"
             (click)="sendMessage(msgInput.value); msgInput.value = ''"
           >
             Send

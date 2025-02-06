@@ -53,6 +53,7 @@ export class GroupChatComponent implements OnInit {
 
   sendGroupMessage() {
     if (this.message.trim()) {
+      // console.log(this.message);
       this.socketService.sendGroupMessage(
         this.teamId,
         this.username,
@@ -60,6 +61,17 @@ export class GroupChatComponent implements OnInit {
       );
       this.message = '';
     }
+  }
+
+  leaveGroupMessage() {
+    this.teamId = '';
+    this.showChat = false;
+
+    // Optionally, clear the messages array if you want to start fresh when rejoining.
+    this.messages = [];
+
+    // You can also add a console log or any additional cleanup logic here.
+    console.log('Left the group chat.');
   }
 
   toggleModal() {

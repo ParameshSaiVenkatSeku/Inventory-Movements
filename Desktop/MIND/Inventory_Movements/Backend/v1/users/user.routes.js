@@ -6,6 +6,7 @@ const {
   getAllUsers,
   forgotPassword,
   resetPassword,
+  chatHistory,
 } = require("./user.controller");
 const authenticateToken = require("../../middlewares/authenticateToken");
 
@@ -158,5 +159,7 @@ router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 
 router.get("/getAllData", getAllUsers);
+
+router.get("/chat-history/:sendId/:recvId", chatHistory);
 
 module.exports = router;
