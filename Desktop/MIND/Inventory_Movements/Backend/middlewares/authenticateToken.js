@@ -8,7 +8,6 @@ Model.knex(db);
 
 const JWT_SECRET = "AkriviaHCM";
 
-// Middleware: Authenticate Token and Fetch Permissions Once
 const authenticateToken = async (req, res, next) => {
   const token = req.headers["authorization"]?.split(" ")[1];
 
@@ -32,28 +31,30 @@ const authenticateToken = async (req, res, next) => {
     }
 
     // Fetch all permissions for the user's role **only once**
-    const permissions = await db("role_permissions")
+    const permissions = await db("users")
+      .join("roles", "users.role_id", "roles.id")
+      .join("role_permissions", "roles.id", "role_permissions.role_id")
       .join("permissions", "role_permissions.permission_id", "permissions.id")
-      .where("role_permissions.role_id", user1.role_id)
+      .where("users.user_id", user.user_id)
       .select("permissions.permission_name");
 
-    // Store user info and permissions in `req.user`
+    // console.log(permissions);
     req.user = {
       id: user1.user_id,
       username: user1.username,
       email: user1.email,
       role_id: user1.role_id,
-      permissions: permissions.map((p) => p.permission_name), // Store as an array
     };
 
     next();
   });
 };
 
-// Middleware: Check User Permissions in Memory
 const authorizePermission = (requiredPermission) => {
   return (req, res, next) => {
-    if (!req.user || !req.user.permissions.includes(requiredPermission)) {
+    const permissions = authenticateToken.permissions;
+    if (!req.user || !permissions.includes(requiredPermission)) {
+      // console.log(req.user.permissions.includes(requiredPermission));
       return res.status(403).json({ message: "Permission denied" });
     }
     next();
