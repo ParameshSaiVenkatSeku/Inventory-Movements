@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { SocketService } from '../../services/socket.service';
 import { environment } from 'src/environments/environment';
-
+import { MainpageService } from '../../services/mainpage.service';
 interface User {
   user_id: number;
   username: string;
@@ -28,7 +28,11 @@ export class ChatComponent implements OnInit, OnDestroy {
   unreadMessages: { [key: number]: number } = {};
   currentUser: any;
 
-  constructor(private http: HttpClient, private socketService: SocketService) {}
+  constructor(
+    private http: HttpClient,
+    private socketService: SocketService,
+    private main: MainpageService
+  ) {}
 
   ngOnInit() {
     this.fetchUsers();

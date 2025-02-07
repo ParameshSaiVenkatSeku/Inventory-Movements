@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { MainpageService } from '../../services/mainpage.service';
 
 // User Interface
 interface User {

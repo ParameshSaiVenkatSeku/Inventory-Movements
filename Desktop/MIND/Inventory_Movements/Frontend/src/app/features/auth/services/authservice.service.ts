@@ -12,7 +12,10 @@ import * as CryptoJS from 'crypto-js';
 export class AuthserviceService {
   private apiUrl = environment.Url;
   authSer: any;
-
+  // private token = sessionStorage.getItem('access_token');
+  // private decodedToken = this.token
+  // ? JSON.parse(atob(this.token.split('.')[1]))
+  // : null;
   constructor(private http: HttpClient) {}
 
   secret_key: string = 'akriviaautomation';

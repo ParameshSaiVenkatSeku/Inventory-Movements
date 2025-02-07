@@ -2,7 +2,10 @@ const express = require("express");
 const dashboard = express.Router();
 const vendor = require("./vendor.controller");
 const categories = require("./categories");
-const authenticateToken = require("../../middlewares/authenticateToken");
+const {
+  authenticateToken,
+  authorizePermission,
+} = require("../../middlewares/authenticateToken");
 const {
   updateImage,
   deleteProduct,
@@ -80,7 +83,11 @@ dashboard.get("/cartData/:id", authenticateToken, getCartData);
  *       404:
  *         description: Item not found.
  */
-dashboard.delete("/deleteItem/:id", deleteCartData);
+dashboard.delete(
+  "/deleteItem/:id",
+  authorizePermission("cart_delete"),
+  deleteCartData
+);
 
 /**
  * @swagger
@@ -125,7 +132,11 @@ dashboard.put("/product/updateImage", updateImage);
  *       404:
  *         description: Product not found.
  */
-dashboard.delete("/product/:productId", deleteProduct);
+dashboard.delete(
+  "/product/:productId",
+  authorizePermission("product_delete"),
+  deleteProduct
+);
 
 /**
  * @swagger
@@ -225,6 +236,6 @@ dashboard.post("/move-to-cart", moveToCart);
  *       400:
  *         description: Invalid product data.
  */
-dashboard.post("/product", postProduct);
+dashboard.post("/product", authorizePermission("product_create"), postProduct);
 
 module.exports = dashboard;

@@ -5,6 +5,7 @@ const {
   getFiles,
   downloadZip,
 } = require("./aws.controller");
+const { authorizePermission } = require("../middlewares/authenticateToken");
 const router = express.Router();
 
 /**
@@ -99,6 +100,6 @@ router.get("/getfiles/:id", getFiles);
  *       200:
  *         description: ZIP archive downloaded successfully.
  */
-router.get("/download-zip", downloadZip);
+router.get("/download-zip", authorizePermission("file_download"), downloadZip);
 
 module.exports = router;

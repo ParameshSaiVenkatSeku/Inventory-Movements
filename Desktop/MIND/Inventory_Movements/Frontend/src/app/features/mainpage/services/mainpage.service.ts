@@ -35,7 +35,6 @@ export class MainpageService {
   }
 
   getUserInfo(): Observable<any> {
-    const token = this.authSer.getToken();
     return this.http.get<any>(`${this.apiUrl}/api/v1/user/userdata`);
   }
 

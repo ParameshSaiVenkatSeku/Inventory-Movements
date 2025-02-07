@@ -4,11 +4,12 @@ const {
   updateUser,
   deleteUser,
   getAllUsers,
-  forgotPassword,
-  resetPassword,
   chatHistory,
 } = require("./user.controller");
-const authenticateToken = require("../../middlewares/authenticateToken");
+const {
+  authenticateToken,
+  authorizePermission,
+} = require("../../middlewares/authenticateToken");
 
 const router = express.Router();
 
